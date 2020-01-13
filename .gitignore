@@ -3,3 +3,4 @@ config.py
 .env
 devnow/
 *.db
+*.log

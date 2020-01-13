@@ -3,7 +3,6 @@
 #
 
 from lib.config import OAConfig
-from lib.DBAccess import DBAccess
 from lib.ErrHandle import ErrHandle
 
 from requests_oauthlib import OAuth1Session
@@ -23,11 +22,14 @@ class GetTL:
 
     #--paramをもとにツイートを取得
     def getTL(self, param):
+        rst = {"stat": 0} #取得結果とステータス
+
         #--API的にリクエスト投げていい?
         self.reloadAPIStat()
         if(self.apistat['remaining'] <= self.remlimit):
             self.erhd.addError("API count limitation")
-            return 1
+            rst['stat'] = 1
+            return rst
 
         #--リクエストを投げ、ヘッダ経由でAPIlimitを更新
         url_ustl = "https://api.twitter.com/1.1/statuses/user_timeline.json"
@@ -37,16 +39,15 @@ class GetTL:
             hdkey = {"limit" : "X-Rate-Limit-Limit","remaining" : "X-Rate-Limit-Remaining","reset" : "X-Rate-Limit-Reset"}
             self.apistat[key] = int(request.headers[hdkey[key]])
         
-        return json.loads(request.text)
+        rst['tweets'] = json.loads(request.text)
+        return rst
 
     #--user_timeline APIの状態を更新
     def reloadAPIStat(self):
         try:
             #--rate-limit-statusを呼び出す(このリクエストはAPIレートに影響を受けない)
             apspath = "https://api.twitter.com/1.1/application/rate_limit_status.json"
-            param = {
-                "resources":"statuses"
-            }
+            param = {"resources":"statuses"}
             request = self.twitter.get(apspath, params=param)
             resp = json.loads(request.text)
 

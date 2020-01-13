@@ -2,6 +2,7 @@
 CREATE table userTable(
     id INT,
     TwitterID STRING, -- Twitter ID
+    modified INTEGER, -- 最終更新日時
     lastid INTEGER, -- 過去ツイ探索用起点
     sinceid INTEGER -- 新規ツイ探索用起点
 );

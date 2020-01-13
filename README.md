@@ -7,7 +7,7 @@ linked account: [@CollectEnchan](twitter.com/CollectEnchan)
 ## Contents
  * main.py: main source (but it's rarely used.)
  * db/
-    * recovery.sql: sql file for recovery (first, you use it on sqlite3 to make `data.db`)
+    * recovery.sql: sql file for recovery
     * data.db(ignored): main database
  * lib/
     * DBAccess.py: DB control

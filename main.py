@@ -1,10 +1,17 @@
 #
 # Twitter画像ダウンローダー
-# DB探索・TLクローリング実行部
 #
+from lib.DBAccess import DBAccess
+from lib.Clawler import Clawler
+from datetime import datetime
 
-from lib.GetTl import GetTL
-import json
+pdo = DBAccess("db/main.db")
+cl = Clawler("db/main.db")
 
-gt = GetTL()
+#--クローリング対象のユーザは存在するか?
+time = 5 #クローリング対象に入るまでの時間 ここで指定した時間が経過するまで同じユーザに対するリクエストは行われない
+pdo.exec("SELECT * FROM userTable WHERE modified<=? ORDER BY modified LIMIT 1", (int(datetime.now().timestamp()) - time,))
+user = pdo.fetch()
 
+if(len(user) != 0):
+    cl.update(user[0], 0) # 0を指定すると過去ツイ 1を指定すると新規ツイを探索

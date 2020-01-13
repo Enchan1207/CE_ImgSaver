@@ -13,9 +13,9 @@ class DBAccess:
         self.cursor = self.connection.cursor()
         
     #--クエリ実行
-    def exec(self,sql, tuplearray):
+    def exec(self,sql, paramtuple):
         try:
-            self.cursor.execute(sql, tuplearray)
+            self.cursor.execute(sql, paramtuple)
             self.connection.commit()
             return True
         except sqlite3.Error as e:
