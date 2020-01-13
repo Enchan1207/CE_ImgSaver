@@ -35,7 +35,7 @@ class TweetHandle:
                 #--ここでは何もしない(キーエラーは「画像のないツイート」に対して実行されるので)
                 pass
             except Exception as e:
-                self.erhd.addError(str(e))
+                self.erhd.addError("TweetHandle" + str(e))
                 print(type(e))
         
         return datalist

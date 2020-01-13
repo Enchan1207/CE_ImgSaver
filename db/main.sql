@@ -13,7 +13,8 @@ CREATE table imageTable(
     TwitterID STRING, -- Twitter ID
     post INTEGER, -- ツイート日時
     content STRING, -- ツイートされたテキスト
-    imgPath STRING -- 画像のパス
+    imgPath STRING, -- 画像のパス
+    localPath STRING -- 画像のローカルパス
 );
 
 -- エラーログテーブル

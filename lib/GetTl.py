@@ -14,7 +14,6 @@ class GetTL:
 
     def __init__(self):
         self.erhd = ErrHandle()
-
         self.twitter = OAuth1Session(OAConfig.CONSUMER_KEY, OAConfig.CONSUMER_SECRET, OAConfig.ACCESS_TOKEN, OAConfig.ACCESS_TOKEN_SECRET)
         self.apistat = {"limit": -1, "remaining": -1, "reset": -1}
         self.reloadAPIStat()
@@ -58,7 +57,7 @@ class GetTL:
             return 0
         except Exception as e:
             #--DBにエラーログを追加
-            self.erhd.addError(str(e))
+            self.erhd.addError("GetTl: " + str(e))
             return 1
 
     #--APIの状態をローカルで取得
