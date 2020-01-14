@@ -13,14 +13,10 @@ class Saver:
         self.pdo = DBAccess(dbname)
         self.svparent = svparent
         self.erhd = ErrHandle()
+        self.result = {"require": -1, "found": -1, "successed": -1}
 
-    #--DBに接続して、下からn枚保存してlocalPathをもってくる
-    def save(self, count):
-        #--DBに接続し、ターゲットのURLを取得
-        sql = "SELECT * FROM imageTable WHERE localPath=? ORDER BY post ASC LIMIT ?"
-        self.pdo.exec(sql, ("Nodata", count,))
-        medias = self.pdo.fetch()
-
+    #--下からn枚保存
+    def save(self, medias):
         try:
             #--各URLに合わせてHTTPReq、とりあえずリストアップ
             files = []
@@ -30,7 +26,7 @@ class Saver:
                 response.close()
                 print("GET requests completed. Access waiting...")
                 time.sleep(5)
-                print("OK. Continue to Save.")
+                print("Continue to Save.")
 
             #--保存先を生成してuuid適当につけて保存し、DBを更新
             for imgData in files:
@@ -45,13 +41,11 @@ class Saver:
             self.erhd.addError("Saver: " + str(e))
 
         result = {
-            "require": count,
             "found": len(medias),
             "successed": len(files)
         }
-        return result
-            
+        self.result = result
 
-
-
-
+    #--保存結果を取得
+    def getStat(self):
+        return self.result
