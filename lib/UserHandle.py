@@ -11,7 +11,7 @@ class UserHandle:
     #--未探索のユーザを検索
     def getUnTrackedUsers(self):
         self.pdo.exec("SELECT * FROM userTable WHERE id=0", ())
-        users = pdo.fetch()
+        users = self.pdo.fetch()
         return users
 
     #--指定TwitterIDのユーザを追加
@@ -22,5 +22,5 @@ class UserHandle:
     #--次に処理するべきユーザを検索(クローリング後一定時間は対象から外れる)
     def getNext(self, count=1, time=10):
         self.pdo.exec("SELECT * FROM userTable WHERE modified<=? ORDER BY modified LIMIT ?", (int(datetime.now().timestamp()) - time, count, ))
-        users = pdo.fetch()
+        users = self.pdo.fetch()
         return users

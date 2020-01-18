@@ -6,3 +6,5 @@ devnow/
 *.log
 dev.sql
 img/*
+.DS_Store
+.vscode/

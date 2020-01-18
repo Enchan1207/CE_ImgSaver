@@ -31,7 +31,7 @@ class TweetHandle:
                 data['timestamp'] = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y').timestamp()
                 datalist.append(data)
 
-            except KeyError as ke:
+            except KeyError:
                 #--ここでは何もしない(キーエラーは「画像のないツイート」に対して実行されるので)
                 pass
             except Exception as e:

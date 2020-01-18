@@ -49,7 +49,7 @@ class Clawler:
         #--userDBを更新
         sinceid = datas[0]['id']
         lastid = datas[-1]['id']
-        sql = "UPDATE userTable SET modified=?,lastid=?,sinceid=? WHERE TwitterID=?"
+        sql = "UPDATE userTable SET id=1, modified=?,lastid=?,sinceid=? WHERE TwitterID=?"
         paramtuple = (int(datetime.now().timestamp()), lastid, sinceid, user[1])
         self.pdo.exec(sql, paramtuple)
 

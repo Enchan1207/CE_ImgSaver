@@ -25,8 +25,10 @@ class Saver:
                 files.append({"url": media[4], "content": response.content})
                 response.close()
                 print("GET requests completed. Access waiting...")
-                time.sleep(3)
-                print("Continue to Save.")
+                #--複数枚投げられたら3秒待機
+                if(len(medias) > 1):
+                    time.sleep(3)
+                    print("Continue to Save.")
 
             #--保存先を生成してuuid適当につけて保存し、DBを更新
             for imgData in files:
@@ -45,6 +47,7 @@ class Saver:
             "successed": len(files)
         }
         self.result = result
+        return result
 
     #--保存結果を取得
     def getStat(self):

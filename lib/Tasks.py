@@ -27,6 +27,7 @@ class Tasks:
     def initUTUsers(self):
         users = self.uh.getUnTrackedUsers()
         if(len(users) != 0):
+            print("process [" + users[0][1] + "] ...")
             result = self.cl.update(users[0], 2)
         else:
             result = -1
@@ -37,23 +38,26 @@ class Tasks:
     #--次に探索すべきユーザを取得し、データを更新
     def updateUsers(self):
         users = self.uh.getNext()
+        rst = 0
         if(len(users) != 0):
-            self.cl.update(users[0], 0)
-            self.cl.update(users[0], 1)
+            #--orで立てると、全てエラーなく終了しない限り必ず1になるので
+            # 大まかなフェイルセーフになる
+            rst = rst or self.cl.update(users[0], 0)
+            rst = rst or self.cl.update(users[0], 1)
+        result = {"length": len(users), "result": rst, "apistat": self.cl.getAPIStat()}
+        return result
 
     #--画像を保存する
     def saveImage(self):
-        #--保存できる画像はあるか?
+        pdo = DBAccess("db/main.db")
         sql = "SELECT * FROM imageTable WHERE localPath=? ORDER BY post ASC LIMIT ?"
-        pdo.exec(sql, ("Nodata", 20,))
+        pdo.exec(sql, ("Nodata", 1,))
         medias = pdo.fetch()
 
         if(len(medias) != 0):
-            self.sv.save(medias)
-
-        return self.sv.getStat()
-
-
+            return self.sv.save(medias)
+        else:
+            return {"found": -1,"successed": -1}
 
 
 
