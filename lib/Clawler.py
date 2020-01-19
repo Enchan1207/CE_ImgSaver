@@ -19,8 +19,8 @@ class Clawler:
 
     #--指定ユーザのTLを漁り、DBを更新
     def update(self, user, mode):
-        #--何よりも先に、ツイートを漁りきっている場合はreturn
-        if(mode == 1 and user[0] == 2):
+        #--何よりも先に、ツイートを漁りきっている/レコード初期化前の場合はreturn
+        if(mode == 1 and user[0] != 1):
             return 0
 
         #--ツイートを取得

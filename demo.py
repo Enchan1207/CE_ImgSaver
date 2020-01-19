@@ -1,15 +1,10 @@
 #
 # Twitter画像ダウンローダー　デモ
 #
-from datetime import datetime
 import time
-
-from lib.DBAccess import DBAccess
-from lib.Clawler import Clawler
-from lib.Saver import Saver
-from lib.UserHandle import UserHandle
-
+from datetime import datetime
 from lib.Tasks import Tasks
+
 task = Tasks()
 
 #--未探索ユーザ探索スレッド起動

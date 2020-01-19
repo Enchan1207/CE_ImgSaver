@@ -12,16 +12,7 @@ class Tasks:
         self.cnt = 0
         self.uh = UserHandle() #ユーザハンドラ
         self.cl = Clawler("db/main.db") #クローラ
-        self.sv = Saver("db/main.db", "D:/KigPhotos") #セーバ
-
-    #--
-    def func(self):
-        print(datetime.now().timestamp())
-        self.cnt += 1
-        if(self.cnt >= 10):
-            return 1
-        else:
-            return 0
+        self.sv = Saver("db/main.db", "/mnt/usb1/kigurumi/") #セーバ
 
     #--未探索のユーザを処理する
     def initUTUsers(self):
