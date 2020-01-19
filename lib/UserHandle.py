@@ -21,6 +21,6 @@ class UserHandle:
 
     #--次に処理するべきユーザを検索(クローリング後一定時間は対象から外れる)
     def getNext(self, count=1, time=10):
-        self.pdo.exec("SELECT * FROM userTable WHERE modified<=? ORDER BY modified LIMIT ?", (int(datetime.now().timestamp()) - time, count, ))
+        self.pdo.exec("SELECT * FROM userTable WHERE modified<=? ORDER BY modified ASC LIMIT ?", (int(datetime.now().timestamp()) - time, count, ))
         users = self.pdo.fetch()
         return users

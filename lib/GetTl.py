@@ -57,6 +57,7 @@ class GetTL:
             return 0
         except Exception as e:
             #--DBにエラーログを追加
+            print(e)
             self.erhd.addError("GetTl: " + str(e))
             return 1
 

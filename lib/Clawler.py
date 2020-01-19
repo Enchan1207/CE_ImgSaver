@@ -8,6 +8,7 @@ from lib.TweetHandle import TweetHandle
 from lib.ErrHandle import ErrHandle
 
 from datetime import datetime
+import time
 
 class Clawler:
     def __init__(self, dbname):
@@ -18,6 +19,10 @@ class Clawler:
 
     #--指定ユーザのTLを漁り、DBを更新
     def update(self, user, mode):
+        #--何よりも先に、ツイートを漁りきっている場合はreturn
+        if(mode == 1 and user[0] == 2):
+            return 0
+
         #--ツイートを取得
         param = {
             "screen_name": user[1],
@@ -28,9 +33,9 @@ class Clawler:
         }
         #モード分岐 0で最新ツイート 1で過去のツイート 2で指定ユーザのDB初期化
         if(mode == 0):
-            param['since_id'] = user[3]
+            param['since_id'] = user[4]
         elif (mode == 1):
-            param['max_id'] = user[4]
+            param['max_id'] = user[3]
         
         tlData = self.gt.getTL(param)
         if(tlData['stat'] == 1):
@@ -47,20 +52,47 @@ class Clawler:
         datas = self.th.handle(tweets)
 
         #--userDBを更新
-        sinceid = datas[0]['id']
-        lastid = datas[-1]['id']
-        sql = "UPDATE userTable SET id=1, modified=?,lastid=?,sinceid=? WHERE TwitterID=?"
-        paramtuple = (int(datetime.now().timestamp()), lastid, sinceid, user[1])
-        self.pdo.exec(sql, paramtuple)
+        if(len(datas) > 0):
+            
+            #--モードによって更新するIDを変える
+            sinceid = user[4]
+            lastid = user[3]
+            if(mode == 0 or mode == 2): #新規ツイ探索
+                sinceid = datas[0]['id'] + 1
+            if (mode == 1 or mode == 2): #過去ツイ探索
+                lastid = datas[-1]['id'] - 1
+            
+            #--userDB更新
+            sql = "UPDATE userTable SET id=1, modified=?,sinceid=?,lastid=? WHERE TwitterID=?"
+            paramtuple = (int(datetime.now().timestamp()), sinceid, lastid, user[1])
+            self.pdo.exec(sql, paramtuple)
 
-        #--imageDBを更新
-        sql = "INSERT INTO imageTable values(0,?,?,?,?,?)"
-        for data in datas:
-            #URL抽出
-            for mdpath in data['image']:
-                paramtuple = (user[1], data['timestamp'], data['text'], mdpath, "Nodata") #nodataはデータ未取得時の識別子
+            #--imageDB追加
+            sql = "INSERT INTO imageTable values(0,?,?,?,?,?)"
+            for data in datas:
+                #URL抽出
+                for mdpath in data['image']:
+                    paramtuple = (user[1], data['timestamp'], data['text'], mdpath, "Nodata") #nodataはデータ未取得時の識別子
+                    self.pdo.exec(sql, paramtuple)
+
+            print("updated.")
+        else:
+            #--ツイートを取得できなくてもmodifiedは変える(これをしないとアカウントが無限ループする)
+            sql = "UPDATE userTable SET modified=? WHERE TwitterID=?"
+            paramtuple = (int(datetime.now().timestamp()), user[1])
+            self.pdo.exec(sql, paramtuple)
+
+            if(mode == 0):
+                print("no new tweets.")
+            elif(mode == 1):
+                print("clawled all old tweets. update userdb.")
+                sql = "UPDATE userTable SET id=2 WHERE TwitterID=?"
+                paramtuple = (user[1],)
                 self.pdo.exec(sql, paramtuple)
+            elif(mode == 2):
+                print("there is no tweet this account: " + str(user[1]))
 
+        time.sleep(3)
         return 0
 
     #--APIの状態を返す

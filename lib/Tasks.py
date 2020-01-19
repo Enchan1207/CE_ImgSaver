@@ -39,11 +39,15 @@ class Tasks:
     def updateUsers(self):
         users = self.uh.getNext()
         rst = 0
-        if(len(users) != 0):
+        if(len(users) > 0):
             #--orで立てると、全てエラーなく終了しない限り必ず1になるので
             # 大まかなフェイルセーフになる
+            print("update " + users[0][1])
             rst = rst or self.cl.update(users[0], 0)
             rst = rst or self.cl.update(users[0], 1)
+        else:
+            print("no target users found.")
+
         result = {"length": len(users), "result": rst, "apistat": self.cl.getAPIStat()}
         return result
 

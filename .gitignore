@@ -8,3 +8,5 @@ dev.sql
 img/*
 .DS_Store
 .vscode/
+*.bat
+*.sh
