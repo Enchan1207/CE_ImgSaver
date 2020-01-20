@@ -56,6 +56,5 @@ def sv_TI_Thread():
 #
 # 同時に建てるスレッドが多くてわけわからんのでひとつずつ実行
 #
-
 init_UTU_Thread()
 upd_TU_Thread()
