@@ -9,6 +9,11 @@ DBAccess.pyではPHPのpdoのようにDBを扱うことができます。クエ�
 関数 `exec(sql, paramtuple)` によってSQLを実行すると、結果を関数 `fetch(count=-1)` で取得できるようになります。  
 fetchの引数countに-1を指定すると、exec関数で実行された結果を全て一度に受け取ることができます。  
 
+## [重要]DBQueue.pyの処理
+
+DBAcccess.pyおよびpythonのsqlte3モジュールはシングルスレッド二しか対応しておらず、ユーザレコードの初期化と更新を同時に行うことができません。クラス`DBQueue`をインポートすることで、これを解決しています。
+DBQueueの詳細は[DBのキュー処理](dbqueue.md)を参照してください。  
+
 ## 各テーブルのカラムと用途
 
 ### errorTable
