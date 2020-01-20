@@ -29,7 +29,6 @@ In details, read [documentation](documentation/index.md).
 **NOTE:** this software requires python modules shown below and some default modules:
 
  * requests
- * requests-oauthlib
 
 if you don't have them, install using `pip`.  
 
@@ -60,6 +59,16 @@ To change this, overwrite line 15 of `lib/Tasks.py`.
 `python demo.py` to run demo.
 
 ## LICENSE
-All files on this repository is published under the MIT license.  
-**NOTE:** The copyright of the data collected using the programs in this repository is held by the user who posted the tweet.  
-Be careful with data handling and do not infringe other users copyright.  
+## Libraries License
+* [psf/requests](https://github.com/psf/requests)
+  > Requests
+  > A simple, yet elegant HTTP library. [https://requests.readthedocs.io](https://requests.readthedocs.io)
+  >
+  > Copyright 2019 Kenneth Reitz  
+  > Apache 2.0 License
+  > https://github.com/psf/requests/blob/master/LICENSE
+  > https://www.apache.org/licenses/LICENSE-2.0
+
+
+## LICENCE
+All files except those described in the Libraries License section are distributed under the MIT license.

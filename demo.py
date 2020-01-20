@@ -54,11 +54,6 @@ def sv_TI_Thread():
         si_result = task.saveImage()
     print("saved " + str(cnt) + " images.")
 
-
-#
-# DB並行処理
-#
-
 #--デキュースレッドを立てる
 def dequeueThread():
     queue4Dequeue = DBQueue()
