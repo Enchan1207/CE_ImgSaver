@@ -3,7 +3,7 @@
 #
 
 from lib.GetTl import GetTL
-from lib.DBAccess import DBAccess
+from lib.DBQueue import DBQueue
 from lib.TweetHandle import TweetHandle
 from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
@@ -16,7 +16,12 @@ class Clawler:
     def __init__(self, dbname):
         self.gt = GetTL()
         self.th = TweetHandle()
-        self.pdo = DBAccess(dbname)
+
+        self.identifier = str(int(datetime.now().timestamp()))
+        self.queue = DBQueue()
+        self.queue.initClient(self.identifier)
+        self.dbqEvent = threading.Event()
+
         self.erhd = ErrHandle()
 
     #--指定ユーザのTLを漁り、DBを更新
@@ -44,7 +49,7 @@ class Clawler:
             #--mode=2のときこのエラーが発生した→不正なTwitterIDとみなす
             if(mode == 2):
                 self.erhd.addError("Clawler: Invalid Twitter ID: " + user[1])
-                self.pdo.exec("DELETE FROM userTable WHERE TwitterID=?", (user[1],))
+                self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
             print("API Limitation or Network Error.")
             return 1
 
@@ -67,7 +72,7 @@ class Clawler:
             #--userDB更新
             sql = "UPDATE userTable SET id=1, modified=?,sinceid=?,lastid=? WHERE TwitterID=?"
             paramtuple = (int(datetime.now().timestamp()), sinceid, lastid, user[1])
-            self.pdo.exec(sql, paramtuple)
+            self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
 
             #--imageDB追加
             sql = "INSERT INTO imageTable values(0,?,?,?,?,?)"
@@ -75,14 +80,16 @@ class Clawler:
                 #URL抽出
                 for mdpath in data['image']:
                     paramtuple = (user[1], data['timestamp'], data['text'], mdpath, "Nodata") #nodataはデータ未取得時の識別子
-                    self.pdo.exec(sql, paramtuple)
+                    self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
+                    self.dbqEvent.wait()
+                    self.dbqEvent.clear()
 
             print("updated.")
         else:
             #--ツイートを取得できなくてもmodifiedは変える(これをしないとアカウントが無限ループする)
             sql = "UPDATE userTable SET modified=? WHERE TwitterID=?"
             paramtuple = (int(datetime.now().timestamp()), user[1])
-            self.pdo.exec(sql, paramtuple)
+            self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
 
             if(mode == 0):
                 print("no new tweets.")
@@ -90,9 +97,13 @@ class Clawler:
                 print("clawled all old tweets. update userdb.")
                 sql = "UPDATE userTable SET id=2 WHERE TwitterID=?"
                 paramtuple = (user[1],)
-                self.pdo.exec(sql, paramtuple)
+                self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
             elif(mode == 2):
                 print("there is no tweet this account: " + str(user[1]))
+
+            #--DB更新待機
+            self.dbqEvent.wait()
+            self.dbqEvent.clear()
 
         time.sleep(3)
         return 0

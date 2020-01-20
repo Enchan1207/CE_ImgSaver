@@ -1,16 +1,18 @@
 #
 # 画像セーバ
 #
-import uuid
-import requests
-import time
+import uuid, requests, time, threading
+from datetime import datetime
 
 from lib.ErrHandle import ErrHandle
-from lib.DBAccess import DBAccess
+from lib.DBQueue import DBQueue
 
 class Saver:
     def __init__(self, dbname, svparent):
-        self.pdo = DBAccess(dbname)
+        self.queue = DBQueue()
+        self.identifier = str(int(datetime.now().timestamp()))
+        self.queue.initClient(self.identifier)
+        self.dqEvent = threading.Event()
         self.svparent = svparent
         self.erhd = ErrHandle()
         self.result = {"require": -1, "found": -1, "successed": -1}
@@ -36,7 +38,11 @@ class Saver:
                 with open(path, mode = 'wb') as f:
                     f.write(imgData['content'])
                 sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
-                self.pdo.exec(sql, (path, imgData['url']))
+                self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
+
+            #--DB更新反映待機
+            self.dqEvent.wait()
+            self.dqEvent.clear()
 
         except Exception as e:
             print(e)

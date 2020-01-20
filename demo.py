@@ -66,10 +66,6 @@ dqthread.start()
 
 thr_iutu = threading.Thread(target=init_UTU_Thread)
 thr_utt = threading.Thread(target=upd_TU_Thread)
-thr_stt = threading.Thread(target=sv_TI_Thread)
 
 thr_iutu.start()
 thr_utt.start()
-thr_stt.start()
-
-#TODO: DBAccess.execをDBQueueに対応させる

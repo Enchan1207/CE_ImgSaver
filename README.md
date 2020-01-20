@@ -14,6 +14,7 @@ linked account: [@CollectEnchan](twitter.com/CollectEnchan)
     * Clawler.py: timeline updater
     * config.py(ignored): TwitterAPI configuration
     * DBAccess.py: DB control
+    * DBQueue.py: DB queue control
     * ErrHandle.py: Error handling
     * GetTl.py: getting twitter timeline
     * Saver.py: saving timelines medias
