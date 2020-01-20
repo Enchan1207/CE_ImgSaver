@@ -15,3 +15,15 @@
 デーモンスレッドに`deQueue`関数を処理させることで、実際のDBアクセスはデーモンスレッドのみが行うようになり、  
 実質「シングルスレッドを保ったままマルチスレッドによるDBアクセスを捌く」という動作になります。  
 `deQueue`の待機は`enQueue`の引数に渡された`threading.Event`でも行えます。  
+
+## デーモンスレッドの立て方
+`deQueue`に使用するデーモンスレッドは以下のコードで立てることができます。  
+
+    def dequeueThread():
+        queue4Dequeue = DBQueue()
+        queue4Dequeue.connect("db/main.db")
+        queue4Dequeue.deQueue(120)
+
+    dqthread = threading.Thread(target=dequeueThread)
+    dqthread.setDaemon(True)
+    dqthread.start()
