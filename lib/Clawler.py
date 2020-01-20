@@ -6,9 +6,11 @@ from lib.GetTl import GetTL
 from lib.DBAccess import DBAccess
 from lib.TweetHandle import TweetHandle
 from lib.ErrHandle import ErrHandle
+from lib.DBQueue import DBQueue
 
 from datetime import datetime
 import time
+import threading
 
 class Clawler:
     def __init__(self, dbname):
