@@ -3,9 +3,9 @@
 #
 import uuid, requests, time, threading
 from datetime import datetime
-
 from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
+import re
 
 class Saver:
     def __init__(self, dbname, svparent):
@@ -34,7 +34,7 @@ class Saver:
 
             #--保存先を生成してuuid適当につけて保存し、DBを更新
             for imgData in files:
-                path = self.svparent + "/" + str(uuid.uuid4()) + ".jpg"    
+                path = self.svparent + "/" + uuid.uuid4() + ".jpg"
                 with open(path, mode = 'wb') as f:
                     f.write(imgData['content'])
                 sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
