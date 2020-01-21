@@ -85,6 +85,7 @@ class Clawler:
                     self.dbqEvent.clear()
 
             print("updated.")
+            return 0
         else:
             #--ツイートを取得できなくてもmodifiedは変える(これをしないとアカウントが無限ループする)
             sql = "UPDATE userTable SET modified=? WHERE TwitterID=?"
@@ -100,13 +101,14 @@ class Clawler:
                 self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
             elif(mode == 2):
                 print("there is no tweet this account: " + str(user[1]))
+                self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
 
             #--DB更新待機
             self.dbqEvent.wait()
             self.dbqEvent.clear()
 
-        time.sleep(3)
-        return 0
+            return 0
+
 
     #--APIの状態を返す
     def getAPIStat(self):
