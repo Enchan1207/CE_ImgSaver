@@ -5,7 +5,7 @@ A simple twitter media downloader written by Python and sqlite.
 linked account: [@CollectEnchan](twitter.com/CollectEnchan)  
 
 ## Contents
- * demo.py: demo source
+ * main.py: main source
  * db/
     * recovery.sql: sql file for recovery
     * data.db(ignored): main database
@@ -39,7 +39,7 @@ if you don't have them, install using `pip`.
  1. run `add.sh (username)` or `add.bat (username)` to add new data to `main.db`.
 
 ### Configuration
-Run `python demo.py` without `lib/config.py`, process will end with error:
+Run `python main.py` without `lib/config.py`, process will end with error:
 
     from lib.config import OAConfig
     ModuleNotFoundError: No module named 'lib.config'
@@ -53,11 +53,11 @@ make `config.py` and write some code shown below:
         ACCESS_TOKEN = "{Access token}"
         ACCESS_TOKEN_SECRET = "{Access token secret}"
 
-You may need to change save path.  
-To change this, overwrite line 15 of `lib/Tasks.py`.
+~~You may need to change save path.~~  
+~~To change this, overwrite line 15 of `lib/Tasks.py`.~~  
 
 ### Execute
-`python demo.py` to run demo.
+`python main.py` to run demo.
 
 ## LICENSE
 ## Libraries License
