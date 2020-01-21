@@ -28,11 +28,12 @@ class DBQueue():
     #--デキュー
     def deQueue(self, timeout):
         while True:
-            if(len(DBQueue.rqQueue) > 0):
+            while (len(DBQueue.rqQueue) > 0):
                 item = DBQueue.rqQueue.pop(0)
                 self.pdo.exec(item['sql'], item['paramtuple'])
                 DBQueue.rsQueue[item['client']].append(self.pdo.fetch())
                 item['event'].set()
+
             result = DBQueue.dcEvent.wait(timeout = timeout)
             DBQueue.dcEvent.clear()
             if(result == False):

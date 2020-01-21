@@ -9,15 +9,14 @@ from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
 
 from datetime import datetime
-import time
-import threading
+import time, threading, uuid
 
 class Clawler:
     def __init__(self, dbname):
         self.gt = GetTL()
         self.th = TweetHandle()
 
-        self.identifier = str(int(datetime.now().timestamp()))
+        self.identifier = uuid.uuid4()
         self.queue = DBQueue()
         self.queue.initClient(self.identifier)
         self.dbqEvent = threading.Event()

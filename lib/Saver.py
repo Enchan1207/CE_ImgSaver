@@ -1,16 +1,15 @@
 #
 # 画像セーバ
 #
-import uuid, requests, time, threading
+import uuid, requests, time, threading, re, uuid
 from datetime import datetime
 from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
-import re
 
 class Saver:
     def __init__(self, dbname, svparent):
         self.queue = DBQueue()
-        self.identifier = str(int(datetime.now().timestamp()))
+        self.identifier = uuid.uuid4()
         self.queue.initClient(self.identifier)
         self.dqEvent = threading.Event()
         self.svparent = svparent
@@ -34,15 +33,15 @@ class Saver:
 
             #--保存先を生成してuuid適当につけて保存し、DBを更新
             for imgData in files:
-                path = self.svparent + "/" + uuid.uuid4() + ".jpg"
+                name = re.findall("\/.*?$", imgData['url'])[0]
+                path = self.svparent + "/" + name
                 with open(path, mode = 'wb') as f:
                     f.write(imgData['content'])
                 sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
                 self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
-
-            #--DB更新反映待機
-            self.dqEvent.wait()
-            self.dqEvent.clear()
+                #--DB更新反映待機
+                self.dqEvent.wait()
+                self.dqEvent.clear()
 
         except Exception as e:
             print(e)
