@@ -6,17 +6,21 @@ import sqlite3
 
 class DBAccess:
 
+    dbname = object
+    connection = object
+    cursor = object
+
     #--コンストラクタ
     def __init__(self, dbname_):
-        self.dbname = dbname_
-        self.connection = sqlite3.connect(self.dbname)
-        self.cursor = self.connection.cursor()
+        DBAccess.dbname = dbname_
+        DBAccess.connection = sqlite3.connect(DBAccess.dbname)
+        DBAccess.cursor = DBAccess.connection.cursor()
         
     #--クエリ実行
     def exec(self,sql, paramtuple):
         try:
-            self.cursor.execute(sql, paramtuple)
-            self.connection.commit()
+            DBAccess.cursor.execute(sql, paramtuple)
+            DBAccess.connection.commit()
             return True
         except sqlite3.Error as e:
             print("error: " + e.args[0])
@@ -25,17 +29,16 @@ class DBAccess:
     #--フェッチ
     def fetch(self, count = -1):
         if(count < 0):
-            return self.cursor.fetchall()
+            return DBAccess.cursor.fetchall()
         else:
-            return self.cursor.fetchone()
-
+            return DBAccess.cursor.fetchone()
 
     #--閉じる
     def close(self):
-        self.connection.close()
+        DBAccess.connection.close()
         
     #--デストラクタで一応commitとclose
     def __del__(self):
-        self.connection.commit()
-        self.connection.close()
+        DBAccess.connection.commit()
+        DBAccess.connection.close()
     
