@@ -76,13 +76,12 @@ def saveImages():
     files = []
     while (not pre_endReq):
         images = uh.getImages(20)
-        print("found:" + str(len(images)))
+        print("found:" + str(len(images)) + " images.")
         if(len(images) == 0):
             pre_endReq = True
 
         for image in images:
             #--サーバから取得して待機
-            print("get: " + image[4])
             files.append(saver.get(image))
             time.sleep(3)
 

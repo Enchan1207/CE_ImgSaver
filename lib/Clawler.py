@@ -23,6 +23,8 @@ class Clawler:
 
         self.erhd = ErrHandle()
 
+        logging.basicConfig(filename="process.log", level=logging.INFO) #ログの出力先とレベル
+
     #--指定ユーザのTLを漁り、DBを更新
     def update(self, user, mode):
         #--何よりも先に、ツイートを漁りきっている/レコード初期化前の場合はreturn

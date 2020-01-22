@@ -11,6 +11,9 @@ class DBQueue():
 
     #--デキューイベント
     dcEvent = threading.Event()
+
+    def __init__(self):
+        logging.basicConfig(filename="process.log", level=logging.INFO) #ログの出力先とレベル
     
     #--
     def connect(self, dbname):
