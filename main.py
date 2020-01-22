@@ -57,17 +57,34 @@ updateThread.setDaemon(True)
 #--画像を保存するスレッドを立てる
 def saveImages():
     print("save tracked image")
+
     saver = Saver("db/main.db", "img")
     uh = UserHandle()
-    while not endReq:
-        images = uh.getImages(40)
-        if(len(images) > 0):
-            saver.save(images)
-            print("Saved.")
-            print("saved")
-        time.sleep(3)
+    pre_endReq = False #endReqをじかに受け取らない
 
-    print("complete save images in this phase.")
+    #--複数枚持ってきてバイナリ取得
+    files = []
+    while (not pre_endReq):
+        images = uh.getImages(20)
+        print("found:" + str(len(images)))
+        if(len(images) == 0):
+            pre_endReq = True
+
+        for image in images:
+            #--サーバから取得して待機
+            print("get: " + image[4])
+            files.append(saver.get(image))
+            time.sleep(3)
+
+            #--終了リクエストが来ても'このfor文は'止まらない
+            if(endReq):
+                pre_endReq = True
+
+    #--適当に名前つけて保存(ここはendReqを無視する)
+    saver.save(files)
+
+    print("complete tracked image.")
+    return 0
 
 saveThread = threading.Thread(target=saveImages)
 saveThread.setDaemon(True)
@@ -75,7 +92,7 @@ saveThread.setDaemon(True)
 #--メインスレッドでは15分待つ、これはcronによる自動化のため
 initThread.start()
 updateThread.start()
-# saveThread.start()
+saveThread.start()
 try:
     time.sleep(15 * 60)
     endReq = True
@@ -84,6 +101,6 @@ except KeyboardInterrupt:
     endReq = True
     initThread.join()
     updateThread.join()
-    # saveThread.join()
+    saveThread.join()
     print("終了リクエストが正常に受理されました。")
     exit(0)

@@ -27,7 +27,7 @@ class Clawler:
     def update(self, user, mode):
         #--何よりも先に、ツイートを漁りきっている/レコード初期化前の場合はreturn
         if(mode == 1 and user[0] != 1):
-            return 0
+            return 2
 
         #--ツイートを取得
         param = {
