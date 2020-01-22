@@ -94,7 +94,8 @@ initThread.start()
 updateThread.start()
 saveThread.start()
 try:
-    time.sleep(15 * 60)
+    n = 12
+    time.sleep(n * 60 * 60) #n時間待機
     endReq = True
 except KeyboardInterrupt:
     print("終了リクエストを受け取りました。スレッドの終了を待機しています…")

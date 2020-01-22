@@ -28,7 +28,7 @@ class Saver:
         try:
             #--保存先を生成してuuid適当につけて保存し、DBを更新
             for imgData in medias:
-                name = uuid.uuid4()
+                name = re.sub(r'^.*\/', "", imgData['url'])
                 path = self.svparent + "/" + name
                 with open(path, mode = 'wb') as f:
                     f.write(imgData['content'])
