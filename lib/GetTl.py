@@ -16,7 +16,8 @@ class GetTL:
     def __init__(self):
         self.erhd = ErrHandle()
         self.twitter = OAuth1Session(OAConfig.CONSUMER_KEY, OAConfig.CONSUMER_SECRET, OAConfig.ACCESS_TOKEN, OAConfig.ACCESS_TOKEN_SECRET)
-        self.apistat = {"limit": -1, "remaining": -1, "reset": -1}
+        self.apistat = {"limit": -1, "remaining": -1, "reset": -1} #gettl api用のapistat
+        self.intAPIStat = {"limit": -1, "remaining": -1, "reset": -1} #apistat更新用のapiのapistat
         self.reloadAPIStat()
         self.remlimit = 100 #残りリクエスト回数がこの数値を切ったらエラーを吐く
 
@@ -25,13 +26,13 @@ class GetTL:
         rst = {"stat": 0} #取得結果とステータス
 
         #--API的にリクエスト投げていい?
-        self.reloadAPIStat()
+        self.getAPIStat()
         if(self.apistat['remaining'] <= self.remlimit):
             self.erhd.addError("API count limitation")
             rst['stat'] = 1
             return rst
 
-        #--リクエストを投げ、ヘッダ経由でAPIlimitを更新
+        #--リクエストを投げ、ヘッダ経由でAPIstatを更新
         url_ustl = "https://api.twitter.com/1.1/statuses/user_timeline.json"
         request = self.twitter.get(url_ustl, params=param)
         for key in self.apistat.keys():
@@ -45,14 +46,14 @@ class GetTL:
     #--user_timeline APIの状態を更新
     def reloadAPIStat(self):
         try:
-            #--rate-limit-statusを呼び出す(このリクエストはAPIレートに影響を受けない)
+            #--rate-limit-statusを呼び出す
             apspath = "https://api.twitter.com/1.1/application/rate_limit_status.json"
-            param = {"resources":"statuses"}
-            request = self.twitter.get(apspath, params=param)
+            request = self.twitter.get(apspath)
             resp = json.loads(request.text)
 
-            #--API状態変数を更新
+            #--APIstatを更新
             for key in self.apistat.keys():
+                self.intAPIStat[key] = int(resp['resources']['application']['/application/rate_limit_status'][key])
                 self.apistat[key] = int(resp['resources']['statuses']['/statuses/user_timeline'][key])
                 
             return 0
@@ -66,5 +67,6 @@ class GetTL:
     def getAPIStat(self):
         #--データを取得した履歴がなければreload
         if(self.apistat['limit'] == -1):
+            print("access to api server...")
             self.reloadAPIStat()
         return self.apistat
