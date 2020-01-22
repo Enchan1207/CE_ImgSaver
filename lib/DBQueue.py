@@ -2,7 +2,7 @@
 # DBのキュー処理
 #
 from lib.DBAccess import DBAccess
-import threading
+import threading, logging
 
 class DBQueue():
     #--キュー
@@ -37,6 +37,7 @@ class DBQueue():
             result = DBQueue.dcEvent.wait(timeout = timeout)
             DBQueue.dcEvent.clear()
             if(result == False):
+                logging.error("DB Connection time out.")
                 print("DBへの接続がタイムアウトしました。")
                 break
 

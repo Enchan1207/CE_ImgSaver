@@ -9,7 +9,7 @@ from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
 
 from datetime import datetime
-import time, threading, uuid
+import time, threading, uuid, logging
 
 class Clawler:
     def __init__(self, dbname):
@@ -49,7 +49,9 @@ class Clawler:
             if(mode == 2):
                 self.erhd.addError("Clawler: Invalid Twitter ID: " + user[1])
                 self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
+                return 2
             print("API Limitation or Network Error.")
+            logging.error("API Limitation or Invalid twitter id")
             return 1
 
         tweets = tlData['tweets']
@@ -83,7 +85,6 @@ class Clawler:
                     self.dbqEvent.wait()
                     self.dbqEvent.clear()
 
-            print("updated.")
             return 0
         else:
             #--ツイートを取得できなくてもmodifiedは変える(これをしないとアカウントが無限ループする)
@@ -92,14 +93,14 @@ class Clawler:
             self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
 
             if(mode == 0):
-                print("no new tweets.")
+                logging.info("now no new tweets: " + user[1])
             elif(mode == 1):
-                print("clawled all old tweets. update userdb.")
+                logging.info("all old tweets has clawled: " + user[1])
                 sql = "UPDATE userTable SET id=2 WHERE TwitterID=?"
                 paramtuple = (user[1],)
                 self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
             elif(mode == 2):
-                print("there is no tweet this account: " + str(user[1]))
+                logging.error("there is no tweet: " + user[1])
                 self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
 
             #--DB更新待機

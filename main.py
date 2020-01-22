@@ -5,12 +5,16 @@ from lib.UserHandle import UserHandle
 from lib.DBQueue import DBQueue
 from lib.Clawler import Clawler
 from lib.Saver import Saver
-import time, threading
+import time, threading, logging
 
 endReq = False #終了リクエスト
+with open("process.log", "a") as f:
+    pass
+logging.basicConfig(filename="process.log", level=logging.INFO) #ログの出力先とレベル
 
 #--デキュースレッドを立てる
 def dequeueThread():
+    logging.info("start to dequeue")
     queue4Dequeue = DBQueue()
     queue4Dequeue.connect("db/main.db")
     queue4Dequeue.deQueue(120)
@@ -21,42 +25,48 @@ dqthread.start()
 
 #--未探索のユーザを探索するスレッドを立てる
 def initRecord():
-    print("start to init untracked user record")
+    logging.info("start to init untracked user record")
     clawler = Clawler("db/main.db")
     uh = UserHandle()
     target = uh.getUnTrackedUser()
     while (len(target) > 0) and (not endReq):
         clawler.update(target[0], 2)
         print("track:" + target[0][1])
-        time.sleep(3)
+        time.sleep(2)
         target = uh.getUnTrackedUser()
 
-    print("complete tracking new users.")
+    logging.info("complete tracking new users.")
         
 initThread = threading.Thread(target=initRecord)
 initThread.setDaemon(True)
 
 #--レコード初期化済みのユーザを更新するスレッドを立てる
 def updateUser():
-    print("start to update tracked user data")
+    logging.info("start to update tracked user data")
     clawler = Clawler("db/main.db")
     uh = UserHandle()
     target = uh.getNext()
-    while (len(target) > 0) and (not endReq):
-        clawler.update(target[0], 0)
-        clawler.update(target[0], 1)
-        print("update:" + target[0][1])
-        time.sleep(3)
+    #--endreqがくるまで止まらない、更新対象がいなくても定期的にDB内に対象ユーザがいないかチェック
+    while (not endReq):
+        if(len(target) > 0):
+            clawler.update(target[0], 0)
+            clawler.update(target[0], 1)
+            print("update:" + target[0][1] + str(clawler.getAPIStat()))
+        time.sleep(2)
         target = uh.getNext()
 
-    print("complete update tracked users in this phase.")
+    if(endReq):
+        print("updateUser has received Endreq.")
+        logging.info("received endreq")
+    else:
+        print("complete update tracked users in this phase.")
 
 updateThread = threading.Thread(target=updateUser)
 updateThread.setDaemon(True)
 
 #--画像を保存するスレッドを立てる
 def saveImages():
-    print("save tracked image")
+    logging.info("save tracked image")
 
     saver = Saver("db/main.db", "img")
     uh = UserHandle()
@@ -83,7 +93,11 @@ def saveImages():
     #--適当に名前つけて保存(ここはendReqを無視する)
     saver.save(files)
 
-    print("complete tracked image.")
+    if endReq:
+        print("saveImages has received EndReq.")
+        logging.info("received endreq")
+    else:
+        print("complete tracked image.")
     return 0
 
 saveThread = threading.Thread(target=saveImages)
