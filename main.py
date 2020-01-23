@@ -33,13 +33,10 @@ def initRecord():
     while (len(target) > 0) and (not endReq):
         clawler.update(target[0], 2)
         print("track:" + target[0][1])
-        time.sleep(2)
+        time.sleep(5)
         target = uh.getUnTrackedUser()
 
     logging.info("complete tracking new users.")
-        
-initThread = threading.Thread(target=initRecord)
-initThread.setDaemon(True)
 
 #--レコード初期化済みのユーザを更新するスレッドを立てる
 def updateUser():
@@ -52,8 +49,9 @@ def updateUser():
         if(len(target) > 0):
             clawler.update(target[0], 0)
             clawler.update(target[0], 1)
-            print("update:" + target[0][1] + str(clawler.getAPIStat()))
-        time.sleep(2)
+            stat = clawler.getAPIStat()
+            print("update:" + target[0][1] + " API Status: " + stat['remaining'] + "/" + stat['limit'])
+        time.sleep(5)
         target = uh.getNext()
 
     if(endReq):
@@ -61,9 +59,6 @@ def updateUser():
         logging.info("received endreq")
     else:
         print("complete update tracked users in this phase.")
-
-updateThread = threading.Thread(target=updateUser)
-updateThread.setDaemon(True)
 
 #--画像を保存するスレッドを立てる
 def saveImages():
@@ -83,39 +78,47 @@ def saveImages():
 
         for image in images:
             #--サーバから取得して待機
+            print(".", end="")
             files.append(saver.get(image))
-            time.sleep(3)
+            time.sleep(5)
 
             #--終了リクエストが来ても'このfor文は'止まらない
             if(endReq):
+                print("saveImages has RECEIVED EndReq.")
                 pre_endReq = True
 
     #--適当に名前つけて保存(ここはendReqを無視する)
+    print("saveImages has started to save " + str(len(files)) + " images...")
     saver.save(files)
 
     if endReq:
-        print("saveImages has received EndReq.")
-        logging.info("received endreq")
+        print("saveImages has accepted EndReq.")
+        logging.info("accepted endreq")
     else:
         print("complete tracked image.")
     return 0
 
+#--メインスレッドではn時間待つ、これはcronによる自動化のため
+updateThread = threading.Thread(target=updateUser)
+updateThread.setDaemon(True)
 saveThread = threading.Thread(target=saveImages)
 saveThread.setDaemon(True)
+initThread = threading.Thread(target=initRecord)
+initThread.setDaemon(True)
 
-#--メインスレッドでは15分待つ、これはcronによる自動化のため
+print("--- Start CE_ImgSaver ---")
 initThread.start()
 updateThread.start()
 saveThread.start()
 try:
-    n = 12
+    n = 1
     time.sleep(n * 60 * 60) #n時間待機
     endReq = True
 except KeyboardInterrupt:
-    print("終了リクエストを受け取りました。スレッドの終了を待機しています…")
+    print("Process end request has requested(not ACCEPTED). please wait other daemon threads...")
     endReq = True
     initThread.join()
     updateThread.join()
     saveThread.join()
-    print("終了リクエストが正常に受理されました。")
+    print("End request has accepted.")
     exit(0)
