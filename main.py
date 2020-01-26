@@ -6,6 +6,7 @@ from lib.UserHandle import UserHandle
 from lib.DBQueue import DBQueue
 from lib.Clawler import Clawler
 from lib.Saver import Saver
+from datetime import datetime
 import time, threading, logging
 
 endReq = False #終了リクエスト
@@ -33,7 +34,7 @@ def initRecord():
     while (len(target) > 0) and (not endReq):
         clawler.update(target[0], 2)
         print("track:" + target[0][1])
-        time.sleep(3)
+        time.sleep(5)
         target = uh.getUnTrackedUser()
 
     logging.info("complete tracking new users.")
@@ -50,7 +51,7 @@ def updateUser():
             clawler.update(target[0], 0)
             clawler.update(target[0], 1)
             stat = clawler.getAPIStat()
-            print("update:" + target[0][1] + " API Status: " + str(stat['remaining']) + "/" + str(stat['limit']))
+            print("update:" + str(target[0][1]) + " API Status: " + str(stat['remaining']) + "/" + str(stat['limit']))
             time.sleep(3)
         else:
             time.sleep(10)
@@ -58,7 +59,7 @@ def updateUser():
         target = uh.getNext()
 
     if(endReq):
-        print("updateUser has received Endreq.")
+        print("updateUser has received(not ACCEPTED) Endreq.")
         logging.info("received endreq")
     else:
         print("complete update tracked users in this phase.")
@@ -67,33 +68,34 @@ def updateUser():
 def saveImages():
     logging.info("save tracked image")
 
-    saver = Saver("db/main.db", "img")
+    saver = Saver("db/main.db", "img/")
     uh = UserHandle()
     pre_endReq = False #endReqをじかに受け取らない
 
     #--複数枚持ってきてバイナリ取得
     files = []
     while (not pre_endReq):
-        images = uh.getImages(20)
+        images = uh.getImages(10)
         print("found:" + str(len(images)) + " images.")
-        #--画像はある?
-        if(len(images) == 0):
-            #--サーバから取得して待機
+        if(len(images) > 0):
             for image in images:
+                #--サーバから取得して待機
                 files.append(saver.get(image))
-                time.sleep(5)
+                print("get: " + image[4])
+                time.sleep(3)
 
                 #--終了リクエストが来ても'このfor文は'止まらない
-                if(endReq):
-                    print("saveImages has RECEIVED EndReq.")
+                if(endReq and (not pre_endReq)):
+                    print("saveImages has received(not ACCEPTED) endreq.")
                     pre_endReq = True
+
 
             #--適当に名前つけて保存(ここはendReqを無視する)
             print("saveImages has started to save " + str(len(files)) + " images...")
             saver.save(files)
-
+            files = []
         else:
-            time.sleep(3)
+            time.sleep(4)
 
     if endReq:
         print("saveImages has accepted EndReq.")
@@ -102,21 +104,20 @@ def saveImages():
         print("complete tracked image.")
     return 0
 
-#--メインスレッドではn時間タイマーを動かす
-print("--- Start CE_ImgSaver ---")
-
+#--メインスレッドではn時間待つ、これはcronによる自動化のため
 updateThread = threading.Thread(target=updateUser)
-saveThread = threading.Thread(target=saveImages)
-initThread = threading.Thread(target=initRecord)
 updateThread.setDaemon(True)
+saveThread = threading.Thread(target=saveImages)
 saveThread.setDaemon(True)
+initThread = threading.Thread(target=initRecord)
 initThread.setDaemon(True)
 
+print("--- Start CE_ImgSaver:" + datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')  + "---")
 initThread.start()
 updateThread.start()
 saveThread.start()
 try:
-    n = 1
+    n = 9
     time.sleep(n * 60 * 60) #n時間待機
     endReq = True
 except KeyboardInterrupt:
