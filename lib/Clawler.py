@@ -8,6 +8,7 @@ from lib.DBQueue import DBQueue
 from lib.TweetHandle import TweetHandle
 from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
+from lib.config import PathConfig
 
 from datetime import datetime
 import time, threading, uuid, logging
@@ -24,7 +25,7 @@ class Clawler:
 
         self.erhd = ErrHandle()
 
-        logging.basicConfig(filename="process.log", level=logging.INFO) #ログの出力先とレベル
+        logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
 
     #--指定ユーザのTLを漁り、DBを更新
     def update(self, user, mode):

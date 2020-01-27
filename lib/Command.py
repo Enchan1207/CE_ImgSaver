@@ -5,7 +5,7 @@ from lib.DMComm import DMComm
 from lib.DBQueue import DBQueue
 from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
-from lib.config import DMConfig
+from lib.config import DMConfig, PathConfig
 
 from datetime import datetime
 import time, threading, uuid, logging, re
@@ -20,7 +20,7 @@ class Command:
 
         self.erhd = ErrHandle()
 
-        logging.basicConfig(filename="process.log", level=logging.INFO) #ログの出力先とレベル
+        logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
 
     #--DMで送られたコマンドを処理する
     def process(self):
@@ -51,16 +51,20 @@ class Command:
             #--コマンドを解析し実行
             resp = "[Responce]"
             for command in commands:
-                mc = re.match(r"(add|stat) @(.*)", command)
+                mc = re.match(r"(add|stat|delete) @(.*)", command)
                 if(mc):
                     #--関数と引数に従って実行
                     func = mc.group(1)
                     param = mc.group(2)
 
                     if(func == "add"):
-                        pass
+                        resp += self.add(param)
+                        resp += "\n---\n"
                     elif (func == "stat"):
                         resp += self.stat(param)
+                        resp += "\n---\n"
+                    elif (func == "delete"):
+                        resp += self.delete(param)
                         resp += "\n---\n"
                     else:
                         print("Invalid command")
