@@ -2,7 +2,7 @@
 #
 # 画像セーバ
 #
-import uuid, requests, time, threading, re, uuid
+import uuid, requests, time, threading, re
 from datetime import datetime
 from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue

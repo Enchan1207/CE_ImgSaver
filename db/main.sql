@@ -1,7 +1,7 @@
 -- ユーザーテーブル
 CREATE table userTable(
     id INT,
-    TwitterID STRING, -- Twitter ID
+    TwitterID TEXT, -- Twitter ID
     modified INTEGER, -- 最終更新日時
     lastid INTEGER, -- 過去ツイ探索用起点
     sinceid INTEGER -- 新規ツイ探索用起点
@@ -10,11 +10,11 @@ CREATE table userTable(
 -- 画像管理テーブル
 CREATE table imageTable(
     id INT,
-    TwitterID STRING, -- Twitter ID
+    TwitterID TEXT, -- Twitter ID
     post INTEGER, -- ツイート日時
-    content STRING, -- ツイートされたテキスト
-    imgPath STRING, -- 画像のパス
-    localPath STRING -- 画像のローカルパス
+    content TEXT, -- ツイートされたテキスト
+    imgPath TEXT, -- 画像のパス
+    localPath TEXT -- 画像のローカルパス
 );
 
 -- エラーログテーブル
