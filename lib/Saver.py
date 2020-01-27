@@ -2,7 +2,7 @@
 #
 # 画像セーバ
 #
-import uuid, requests, time, threading, re
+import uuid, requests, time, threading, re, os
 from datetime import datetime
 from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
@@ -31,10 +31,13 @@ class Saver:
             for imgData in medias:
                 name = re.sub(r'^.*\/', "", imgData['url'])
                 path = self.svparent + "/" + name
-                with open(path, mode = 'wb') as f:
-                    f.write(imgData['content'])
-                sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
-                self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
+                if(os.path.exists(path)):
+                    with open(path, mode = 'wb') as f:
+                        f.write(imgData['content'])
+                    sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
+                    self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
+                else:
+                    print("already saved")
 
                 #--DB更新反映待機
                 self.dqEvent.wait()
