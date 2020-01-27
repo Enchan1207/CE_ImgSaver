@@ -110,7 +110,10 @@ def waitDMEvents():
     while not endReq:
         cmd = Command()
         cmd.process()
-        time.sleep(70)
+        for n in range(70):
+            if(endReq):
+                break
+            time.sleep(1)
     print("waitDM accepted endReq.")
 
 #--メインスレッドではn時間待つ、これはcronによる自動化のため

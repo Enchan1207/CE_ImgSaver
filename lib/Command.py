@@ -106,9 +106,10 @@ class Command:
 
         #--適当にレスポンス返す
         if(len(usrStat) > 0):
+            ids = ["未追跡", "追跡中", "ツイート履歴サーチ済"]
             resp = ""
             resp += "\nTwitterID " + str(TwitterID) + "の詳細:\n"
-            resp += "id: " + str(usrStat[0][0]) + "\n"
+            resp += "id: " + str(ids[usrStat[0][0]]) + "\n"
             resp += "全体画像枚数: " + str(allimg[0][0]) + "\n"
             resp += "保存済み画像枚数: " + str(svdimg[0][0]) + "\n"
             if(allimg[0][0] > 0):
@@ -118,4 +119,24 @@ class Command:
         else:
             resp = "エラー: twitterid " + str(TwitterID) + " が見つかりません"
         
+        return resp
+
+    #--コマンド:指定IDのユーザを追加
+    def add(self, TwitterID):
+        sql = "INSERT INTO userTable VALUES(0,?,0,0,0);"
+        paramtuple = (TwitterID,)
+        self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
+        self.dbqEvent.wait()
+        self.dbqEvent.clear()
+        resp = "\nTwitterID " + str(TwitterID) + "を追加しました。"
+        return resp
+    
+    #--コマンド:指定IDのユーザを削除
+    def delete(self, TwitterID):
+        sql = "DELETE FROM userTable WHERE TwitterID=?;"
+        paramtuple = (TwitterID,)
+        self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
+        self.dbqEvent.wait()
+        self.dbqEvent.clear()
+        resp = "\nTwitterID " + str(TwitterID) + "を削除しました。"
         return resp
