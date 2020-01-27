@@ -6,6 +6,7 @@ from lib.UserHandle import UserHandle
 from lib.DBQueue import DBQueue
 from lib.Clawler import Clawler
 from lib.Saver import Saver
+from lib.Command import Command
 from datetime import datetime
 import time, threading, logging
 
@@ -104,6 +105,14 @@ def saveImages():
         print("complete tracked image.")
     return 0
 
+#--DMを待機するスレッドを立てる
+def waitDMEvents():
+    while not endReq:
+        cmd = Command()
+        cmd.process()
+        time.sleep(70)
+    print("waitDM accepted endReq.")
+
 #--メインスレッドではn時間待つ、これはcronによる自動化のため
 updateThread = threading.Thread(target=updateUser)
 updateThread.setDaemon(True)
@@ -111,11 +120,14 @@ saveThread = threading.Thread(target=saveImages)
 saveThread.setDaemon(True)
 initThread = threading.Thread(target=initRecord)
 initThread.setDaemon(True)
+dmThread = threading.Thread(target=waitDMEvents)
+dmThread.setDaemon(True)
 
 print("--- Start CE_ImgSaver:" + datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')  + "---")
 initThread.start()
 updateThread.start()
 saveThread.start()
+dmThread.start()
 try:
     n = 9
     time.sleep(n * 60 * 60) #n時間待機
@@ -126,5 +138,6 @@ except KeyboardInterrupt:
     initThread.join()
     updateThread.join()
     saveThread.join()
+    dmThread.join()
     print("End request has accepted.")
     exit(0)

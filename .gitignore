@@ -11,3 +11,4 @@ img/*
 *.bat
 *.sh
 logfile/
+recov.py
