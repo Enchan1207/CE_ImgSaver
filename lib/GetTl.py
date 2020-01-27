@@ -50,6 +50,7 @@ class GetTL:
             apspath = "https://api.twitter.com/1.1/application/rate_limit_status.json"
             request = self.twitter.get(apspath)
             resp = json.loads(request.text)
+            print(request.text)
 
             #--APIstatを更新
             for key in self.apistat.keys():

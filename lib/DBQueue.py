@@ -3,6 +3,7 @@
 # DBのキュー処理
 #
 from lib.DBAccess import DBAccess
+from lib.config import PathConfig
 import threading, logging
 
 class DBQueue():
@@ -14,7 +15,7 @@ class DBQueue():
     dcEvent = threading.Event()
 
     def __init__(self):
-        logging.basicConfig(filename="process.log", level=logging.INFO) #ログの出力先とレベル
+        logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
     
     #--
     def connect(self, dbname):

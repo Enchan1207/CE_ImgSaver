@@ -7,13 +7,14 @@ from lib.DBQueue import DBQueue
 from lib.Clawler import Clawler
 from lib.Saver import Saver
 from lib.Command import Command
+from lib.config import PathConfig
 from datetime import datetime
 import time, threading, logging
 
 endReq = False #終了リクエスト
-with open("process.log", "a") as f:
+with open(PathConfig.PATH_LOGOUTPUT, "a") as f:
     pass
-logging.basicConfig(filename="process.log", level=logging.INFO) #ログの出力先とレベル
+logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
 
 #--デキュースレッドを立てる
 def dequeueThread():
@@ -69,7 +70,7 @@ def updateUser():
 def saveImages():
     logging.info("save tracked image")
 
-    saver = Saver("db/main.db", "img/")
+    saver = Saver("db/main.db", PathConfig.PATH_IMGSAVE)
     uh = UserHandle()
     pre_endReq = False #endReqをじかに受け取らない
 
@@ -110,7 +111,7 @@ def waitDMEvents():
     while not endReq:
         cmd = Command()
         cmd.process()
-        for n in range(70):
+        for n in range(80):
             if(endReq):
                 break
             time.sleep(1)
