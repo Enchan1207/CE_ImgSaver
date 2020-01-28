@@ -45,17 +45,22 @@ class Clawler:
             param['max_id'] = user[3]
         
         tlData = self.gt.getTL(param)
+
+        if(not ('tweets' in tlData)):
+            logging.error("[Clawler] Fatal Error: can't get tweet timeline.")
+            return 1
+
         #--ツイート取得時にエラー発生
         if('errors' in tlData['tweets']):
             #--mode=2のときこのエラーが発生した→不正なTwitterIDとみなす
-            logging.error("Can't get Tweets: " + str(user[1]))
+            logging.error("[Clawler] Can't get Tweets: " + str(user[1]))
             if(mode == 2):
                 self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
                 return 2
 
         #--API制限に引っかかった
         if(tlData['stat'] == 1):
-            logging.error("API Limitation")
+            logging.error("[Clawler] API Limitation")
             return 1
 
         tweets = tlData['tweets']
@@ -97,14 +102,14 @@ class Clawler:
             self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
 
             if(mode == 0):
-                logging.debug("now no new tweets: " + user[1])
+                logging.debug("[Clawler] now no new tweets: " + user[1])
             elif(mode == 1):
-                logging.info("all old tweets has clawled: " + user[1])
+                logging.info("[Clawler] all old tweets has clawled: " + user[1])
                 sql = "UPDATE userTable SET id=2 WHERE TwitterID=?"
                 paramtuple = (user[1],)
                 self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
             elif(mode == 2):
-                logging.info("there is no tweet: " + user[1])
+                logging.info("[Clawler] there is no tweet: " + user[1])
                 self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
 
             #--DB更新待機

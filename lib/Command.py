@@ -39,7 +39,7 @@ class Command:
                     #--マスターによって投げられたDMならキューに追加
                     if(senderID == DMConfig.ID_MASTER):
                         commands.append(cmd)
-                        logging.debug("DMComm: Added command:" + cmd)
+                        logging.debug("[Command] Added command:" + cmd)
 
                     #--自分の返信(つまり、コマンドに対するレスポンス)が来た時点でbreak
                     if(re.match(r'\[Responce\]', cmd)):
@@ -66,12 +66,12 @@ class Command:
 
             if(not (resp == "[Responce]")):
                 self.dc.sendDM(DMConfig.ID_MASTER, resp)
-                logging.info("The DM Responce was sent.")
+                logging.info("[Command] The DM Responce was sent.")
 
             return 0
 
         else:
-            logging.error("DMComm: API Limitation")
+            logging.error("[Command] API Limitation")
             return -1
 
     #--コマンド:指定ユーザの詳細状態表示

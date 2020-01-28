@@ -38,7 +38,7 @@ class Saver:
                     sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
                     self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
                 else:
-                    logging.debug("this image is already saved: " + str(path))
+                    logging.debug("[Saver] this image is already saved: " + str(path))
 
                 #--DB更新反映待機
                 self.dqEvent.wait()
@@ -46,7 +46,7 @@ class Saver:
             return 0
 
         except Exception as e:
-            logging.error("Saver: " + str(e))
+            logging.error("[Saver(internal)] " + str(e))
             return 1
 
     #--保存結果を取得

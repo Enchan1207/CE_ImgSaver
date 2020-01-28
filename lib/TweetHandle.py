@@ -37,6 +37,6 @@ class TweetHandle:
                 #--ここでは何もしない(キーエラーは「画像のないツイート」に対して実行されるので)
                 pass
             except Exception as e:
-                logging.error("TweetHandle" + str(e))
+                logging.error("[TweetHandle(internal)] " + str(e))
         
         return datalist

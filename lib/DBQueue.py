@@ -42,7 +42,7 @@ class DBQueue():
             result = DBQueue.dcEvent.wait(timeout = timeout)
             DBQueue.dcEvent.clear()
             if(result == False):
-                logging.error("DB Connection time out.")
+                logging.error("[DBQueue] DB Connection time out.")
                 break
 
     #--リザルトキューからフェッチ

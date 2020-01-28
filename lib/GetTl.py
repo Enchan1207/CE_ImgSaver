@@ -27,7 +27,10 @@ class GetTL:
         #--API的にリクエスト投げていい?
         self.getAPIStat()
         if(self.apistat['remaining'] <= self.remlimit):
-            logging.error("API count limitation")
+            if(self.apistat['remaining'] > 0):
+                logging.error("[GetTL] API count limitation")
+            else:
+                logging.error("[GetTL] can't get API limit status")
             rst['stat'] = 1
             return rst
 
@@ -57,13 +60,13 @@ class GetTL:
                 
             return 0
         except Exception as e:
-            logging.error("GetTl: " + str(e))
+            logging.error("[GetTL(internal)] " + str(e))
             return 1
 
     #--APIの状態をローカルで取得
     def getAPIStat(self):
         #--データを取得した履歴がなければreload
         if(self.apistat['limit'] == -1):
-            logging.debug("Access to API-Limit-list endpoint")
+            logging.debug("[GetTL] Access to API-Limit-list endpoint")
             self.reloadAPIStat()
         return self.apistat
