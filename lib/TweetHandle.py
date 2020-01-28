@@ -3,7 +3,8 @@
 # ツイートハンドラ
 #
 
-import json
+import json, logging
+from lib.config import PathConfig
 from lib.ErrHandle import ErrHandle
 from datetime import datetime
 
@@ -12,6 +13,8 @@ class TweetHandle:
         self.erhd = ErrHandle()
         self.lastid = -1
         self.sinceid = -1
+
+        logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
 
     #--ツイートを解析してユーザデータおよび画像ファイルのパスを取得
     def handle(self, tweets):
@@ -36,7 +39,6 @@ class TweetHandle:
                 #--ここでは何もしない(キーエラーは「画像のないツイート」に対して実行されるので)
                 pass
             except Exception as e:
-                self.erhd.addError("TweetHandle" + str(e))
-                print(type(e))
+                logging.error("TweetHandle" + str(e))
         
         return datalist

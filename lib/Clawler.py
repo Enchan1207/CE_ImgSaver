@@ -51,7 +51,7 @@ class Clawler:
         #--ツイート取得時にエラー発生
         if('errors' in tlData['tweets']):
             #--mode=2のときこのエラーが発生した→不正なTwitterIDとみなす
-            print("Cant get Tweets.")
+            logging.error("Can't get Tweets: " + str(user[1]))
             if(mode == 2):
                 self.erhd.addError("Clawler: Invalid Twitter ID: " + user[1])
                 self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
@@ -59,7 +59,6 @@ class Clawler:
 
         #--API制限に引っかかった
         if(tlData['stat'] == 1):
-            print("API Limitation or Network Error.")
             logging.error("API Limitation")
             return 1
 

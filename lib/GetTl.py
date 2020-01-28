@@ -3,13 +3,12 @@
 # タイムライン取得
 #
 
-from lib.config import OAConfig
+from lib.config import OAConfig, PathConfig
 from lib.ErrHandle import ErrHandle
 
 from requests_oauthlib import OAuth1Session
 from datetime import datetime
-import re
-import json
+import re, json ,logging
 
 class GetTL:
 
@@ -20,6 +19,8 @@ class GetTL:
         self.intAPIStat = {"limit": -1, "remaining": -1, "reset": -1} #apistat更新用のapiのapistat
         self.reloadAPIStat()
         self.remlimit = 100 #残りリクエスト回数がこの数値を切ったらエラーを吐く
+
+        logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
 
     #--paramをもとにツイートを取得
     def getTL(self, param):
@@ -50,7 +51,6 @@ class GetTL:
             apspath = "https://api.twitter.com/1.1/application/rate_limit_status.json"
             request = self.twitter.get(apspath)
             resp = json.loads(request.text)
-            print(request.text)
 
             #--APIstatを更新
             for key in self.apistat.keys():
@@ -59,15 +59,13 @@ class GetTL:
                 
             return 0
         except Exception as e:
-            #--DBにエラーログを追加
-            print(e)
-            self.erhd.addError("GetTl: " + str(e))
+            logging.error("GetTl: " + str(e))
             return 1
 
     #--APIの状態をローカルで取得
     def getAPIStat(self):
         #--データを取得した履歴がなければreload
         if(self.apistat['limit'] == -1):
-            print("access to api server...")
+            logging.debug("Access to API-Limit-list endpoint")
             self.reloadAPIStat()
         return self.apistat

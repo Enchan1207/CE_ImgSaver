@@ -24,7 +24,6 @@ class DBAccess:
             DBAccess.connection.commit()
             return True
         except sqlite3.Error as e:
-            print("error: " + e.args[0])
             return False
 
     #--フェッチ

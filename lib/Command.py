@@ -66,21 +66,14 @@ class Command:
                     elif (func == "delete"):
                         resp += self.delete(param)
                         resp += "\n---\n"
-                    else:
-                        print("Invalid command")
 
-                else:
-                    print("it's not command")
-
-            print(resp)
             if(not (resp == "[Responce]")):
                 self.dc.sendDM(DMConfig.ID_MASTER, resp)
-                print("sended responce")
+                logging.info("The DM Responce was sent.")
 
             return 0
 
         else:
-            print("DMComm: API Limitation")
             logging.error("DMComm: API Limitation")
             self.erhd.addError("DMComm: API Limitation")
             return -1

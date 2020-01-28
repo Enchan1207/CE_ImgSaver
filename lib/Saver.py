@@ -2,10 +2,11 @@
 #
 # 画像セーバ
 #
-import uuid, requests, time, threading, re, os
+import uuid, requests, time, threading, re, os, logging
 from datetime import datetime
 from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
+from lib.config import PathConfig
 
 class Saver:
     def __init__(self, dbname, svparent):
@@ -16,6 +17,8 @@ class Saver:
         self.svparent = svparent
         self.erhd = ErrHandle()
         self.result = {"require": -1, "found": -1, "successed": -1}
+
+        logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
 
     #--レコードをもとに画像のバイナリを取得
     def get(self, media):
@@ -37,7 +40,7 @@ class Saver:
                     sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
                     self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
                 else:
-                    print("already saved")
+                    logging.debug("this image is already saved: " + str(path))
 
                 #--DB更新反映待機
                 self.dqEvent.wait()
@@ -45,8 +48,7 @@ class Saver:
             return 0
 
         except Exception as e:
-            print(e)
-            self.erhd.addError("Saver: " + str(e))
+            logging.error("Saver: " + str(e))
             return 1
 
     #--保存結果を取得
