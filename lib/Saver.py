@@ -4,7 +4,6 @@
 #
 import uuid, requests, time, threading, re, os, logging
 from datetime import datetime
-from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
 from lib.config import PathConfig
 
@@ -15,7 +14,6 @@ class Saver:
         self.queue.initClient(self.identifier)
         self.dqEvent = threading.Event()
         self.svparent = svparent
-        self.erhd = ErrHandle()
         self.result = {"require": -1, "found": -1, "successed": -1}
 
         logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル

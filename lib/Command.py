@@ -3,7 +3,6 @@
 #
 from lib.DMComm import DMComm
 from lib.DBQueue import DBQueue
-from lib.ErrHandle import ErrHandle
 from lib.DBQueue import DBQueue
 from lib.config import DMConfig, PathConfig
 
@@ -17,8 +16,6 @@ class Command:
         self.queue.initClient(self.identifier)
         self.dbqEvent = threading.Event()
         self.dc = DMComm()
-
-        self.erhd = ErrHandle()
 
         logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
 
@@ -42,7 +39,7 @@ class Command:
                     #--マスターによって投げられたDMならキューに追加
                     if(senderID == DMConfig.ID_MASTER):
                         commands.append(cmd)
-                        logging.info("DMComm: Added command:" + cmd)
+                        logging.debug("DMComm: Added command:" + cmd)
 
                     #--自分の返信(つまり、コマンドに対するレスポンス)が来た時点でbreak
                     if(re.match(r'\[Responce\]', cmd)):
@@ -75,7 +72,6 @@ class Command:
 
         else:
             logging.error("DMComm: API Limitation")
-            self.erhd.addError("DMComm: API Limitation")
             return -1
 
     #--コマンド:指定ユーザの詳細状態表示

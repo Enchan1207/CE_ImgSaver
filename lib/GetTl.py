@@ -4,7 +4,6 @@
 #
 
 from lib.config import OAConfig, PathConfig
-from lib.ErrHandle import ErrHandle
 
 from requests_oauthlib import OAuth1Session
 from datetime import datetime
@@ -13,7 +12,6 @@ import re, json ,logging
 class GetTL:
 
     def __init__(self):
-        self.erhd = ErrHandle()
         self.twitter = OAuth1Session(OAConfig.CONSUMER_KEY, OAConfig.CONSUMER_SECRET, OAConfig.ACCESS_TOKEN, OAConfig.ACCESS_TOKEN_SECRET)
         self.apistat = {"limit": -1, "remaining": -1, "reset": -1} #gettl api用のapistat
         self.intAPIStat = {"limit": -1, "remaining": -1, "reset": -1} #apistat更新用のapiのapistat
@@ -29,7 +27,7 @@ class GetTL:
         #--API的にリクエスト投げていい?
         self.getAPIStat()
         if(self.apistat['remaining'] <= self.remlimit):
-            self.erhd.addError("API count limitation")
+            logging.error("API count limitation")
             rst['stat'] = 1
             return rst
 

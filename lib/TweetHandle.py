@@ -5,12 +5,10 @@
 
 import json, logging
 from lib.config import PathConfig
-from lib.ErrHandle import ErrHandle
 from datetime import datetime
 
 class TweetHandle:
     def __init__(self):
-        self.erhd = ErrHandle()
         self.lastid = -1
         self.sinceid = -1
 
