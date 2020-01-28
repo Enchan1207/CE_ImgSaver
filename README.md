@@ -9,7 +9,7 @@ linked account: [@CollectEnchan](twitter.com/CollectEnchan)
  * db/
     * recovery.sql: sql file for recovery
     * data.db(ignored): main database
-    * (some batch or shell file is used to observe using `watch` or `cat`.)
+    * ~~(some batch or shell file is used to observe using `watch` or `cat`.)~~ **Ignored**
  * lib/
     * Clawler.py: timeline updater
     * Command.py: DM Command parse and execute
@@ -17,10 +17,10 @@ linked account: [@CollectEnchan](twitter.com/CollectEnchan)
     * DBAccess.py: DB control
     * DBQueue.py: DB queue control
     * DMComm.py: DM Communication
-    * ErrHandle.py: Error handling
+    * ~~ErrHandle.py: Error handling~~ **Error handling is replaced by logging module.**
     * GetTl.py: getting twitter timeline
     * Saver.py: saving timelines medias
-    * ~~Tasks.py: tasks for automation~~
+    * ~~Tasks.py: tasks for automation~~ **All thread process is written in main.py**
     * TweetHandle.py: Tweet handling
     * UserHandle.py: User  handling
 
