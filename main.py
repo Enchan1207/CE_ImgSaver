@@ -61,7 +61,7 @@ def updateUser():
         target = uh.getNext()
 
     if(endReq):
-        logging.info("[main - updateUser] received endreq")
+        logging.info("[main - updateUser] accepted endreq")
     else:
         logging.info("[main - updateUser] complete update")
 
@@ -95,13 +95,14 @@ def saveImages():
             logging.info("[main - saveImage] started to save " + str(len(files)) + " images...")
             saver.save(files)
             files = []
+            logging.info("[main - saveImage] complete to save.")
         else:
             time.sleep(4)
 
     if endReq:
         logging.info("[main - saveImage] accepted endreq")
     else:
-        logging.info("[main - saveImage] complete tracked image.")
+        logging.info("[main - saveImage] image tracking completed")
     return 0
 
 #--DMを待機するスレッドを立てる
@@ -129,7 +130,7 @@ logging.info("--- Start CE_ImgSaver:" + datetime.now().strftime('%Y年%m月%d日
 initThread.start()
 updateThread.start()
 saveThread.start()
-# dmThread.start()
+dmThread.start()
 try:
     n = 9
     time.sleep(n * 60 * 60) #n時間待機
@@ -140,6 +141,6 @@ except KeyboardInterrupt:
     initThread.join()
     updateThread.join()
     saveThread.join()
-    # dmThread.join()
+    dmThread.join()
     print("End request has accepted.")
     exit(0)

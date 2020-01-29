@@ -32,13 +32,13 @@ class Saver:
             for imgData in medias:
                 name = re.sub(r'^.*\/', "", imgData['url'])
                 path = self.svparent + "/" + name
-                if(os.path.exists(path)):
+                if(not os.path.exists(path)):
                     with open(path, mode = 'wb') as f:
                         f.write(imgData['content'])
                     sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
                     self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
                 else:
-                    logging.debug("[Saver] this image is already saved: " + str(path))
+                    logging.info("[Saver] this image is already saved: " + str(path))
 
                 #--DB更新反映待機
                 self.dqEvent.wait()

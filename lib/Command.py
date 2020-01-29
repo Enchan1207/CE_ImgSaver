@@ -23,7 +23,7 @@ class Command:
     def process(self):
         #--API的に大丈夫?
         stat = self.dc.getAPIStat()
-        remain = stat['X-Rate-Limit-Remaining']
+        remain = stat['x-rate-limit-remaining']
         if(remain > 3):
             #--イベントからコマンドを収集
             events = self.dc.getEvents(param={"count": 20,})['events']
