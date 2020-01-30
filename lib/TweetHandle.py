@@ -20,7 +20,7 @@ class TweetHandle:
         for tweet in tweets:
             data = {'id': -1, 'timestamp': -1, 'text': "", 'image': []}
             try:
-                entities = tweet['entities']
+                entities = tweet['extended_entities']
 
                 #--画像付きツイートの場合はパスを収集
                 if('media' in entities):
