@@ -20,8 +20,8 @@ class Saver:
 
     #--レコードをもとに画像のバイナリを取得
     def get(self, media):
-        response = requests.get(media[4])
-        imgData = {"url": media[4], "content": response.content}
+        response = requests.get(media[5])
+        imgData = {"url": media[5], "content": response.content}
         response.close()
         return imgData
 

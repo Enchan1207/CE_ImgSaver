@@ -82,7 +82,7 @@ def saveImages():
             for image in images:
                 #--サーバから取得して待機
                 files.append(saver.get(image))
-                logging.debug("[main - saveImage] get: " + image[4])
+                logging.info("[main - saveImage] get: " + image[5])
                 time.sleep(3)
 
                 #--終了リクエストが来ても'このfor文は'止まらない
