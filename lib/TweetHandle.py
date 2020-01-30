@@ -22,8 +22,9 @@ class TweetHandle:
             try:
                 entities = tweet['entities']
 
-                #--画像付きツイートの場合はパスを収集
+                #--画像付きツイートの場合はパスとfav数を収集
                 if('media' in entities):
+                    data['likes'] = tweet['favorite_count']
                     for media in entities['media']:
                         data['image'].append(media['media_url_https'])
 

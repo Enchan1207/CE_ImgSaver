@@ -11,6 +11,7 @@ CREATE table userTable(
 CREATE table imageTable(
     id INT,
     TwitterID TEXT, -- Twitter ID
+    likes INT, -- いいね数
     post INTEGER, -- ツイート日時
     content TEXT, -- ツイートされたテキスト
     imgPath TEXT, -- 画像のパス
