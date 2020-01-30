@@ -20,6 +20,8 @@ class Saver:
 
     #--レコードをもとに画像のバイナリを取得
     def get(self, media):
+        #--TODO:fav数で画質を振り分ける
+
         response = requests.get(media[5])
         imgData = {"url": media[5], "content": response.content}
         response.close()

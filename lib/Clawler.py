@@ -88,7 +88,6 @@ class Clawler:
             sql = "INSERT INTO imageTable values(0,?,?,?,?,?,?)"
             for data in datas:
                 #URL抽出
-                print(len(data['image']))
                 for mdpath in data['image']:
                     paramtuple = (user[1], data['likes'], data['timestamp'], data['text'], mdpath, "Nodata") #nodataはデータ未取得時の識別子
                     self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
