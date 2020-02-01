@@ -20,10 +20,22 @@ class Saver:
 
     #--レコードをもとに画像のバイナリを取得
     def get(self, media):
-        #--TODO:fav数で画質を振り分ける
+        #--優先ポイント取得+URLパース
+        likes = media[2]
+        url_raw = media[5]
+        url = url_raw
+        url_elem = re.search(r'(.*\/)(.*?).(jpg|png)$', url_raw).groups(0)
+        url_path = url_elem[0]
+        url_id = url_elem[1]
+        url_sf = url_elem[2]
 
-        response = requests.get(media[5])
-        imgData = {"url": media[5], "content": response.content}
+        if(likes >= 0.3): #高画質
+            url = url_path + url_id + "?format=png"
+        if(likes >= 0.8): #最高画質
+            url = url_path + url_id + "?format=png&name=4096x4096"
+
+        response = requests.get(url)
+        imgData = {"url": url, "content": response.content}
         response.close()
         return imgData
 

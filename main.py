@@ -129,8 +129,8 @@ dmThread.setDaemon(True)
 logging.info("--- Start CE_ImgSaver:" + datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')  + "---")
 initThread.start()
 updateThread.start()
-saveThread.start()
-dmThread.start()
+# saveThread.start()
+# dmThread.start()
 try:
     n = 9
     time.sleep(n * 60 * 60) #n時間待機

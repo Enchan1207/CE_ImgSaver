@@ -29,7 +29,10 @@ class TweetHandle:
 
                 #--画像付きツイートの場合はパスとfav数を収集
                 if('media' in entities):
-                    data['likes'] = tweet['favorite_count']
+                    #--ここで画像に「優先ポイント」を振る
+                    data['likes'] = float(tweet['favorite_count']) / float(tweet['user']['followers_count'])
+                    # print(str(int(tweet['user']['followers_count'])) + ", " + str(data['likes']))
+
                     for media in entities['media']:
                         data['image'].append(media['media_url_https'])
 
