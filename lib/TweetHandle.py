@@ -16,7 +16,12 @@ class TweetHandle:
 
     #--ツイートを解析してユーザデータおよび画像ファイルのパスを取得
     def handle(self, tweets):
-        datalist = []
+        rst = {"datalist": [], "info": {"followers": 114514}} #infoで一段挟んでるのは静的なツイート情報が必要になったときの予約
+
+        #--ついでにフォロワー数もとっとく
+        if(len(tweets) > 0):
+            rst['info']['followers'] = tweets[0]['user']['followers_count']
+
         for tweet in tweets:
             data = {'id': -1, 'timestamp': -1, 'text': "", 'image': []}
             try:
@@ -32,7 +37,7 @@ class TweetHandle:
                 data['id'] = tweet['id']
                 data['text'] = tweet['text']
                 data['timestamp'] = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S %z %Y').timestamp()
-                datalist.append(data)
+                rst['datalist'].append(data)
 
             except KeyError:
                 #--ここでは何もしない(キーエラーは「画像のないツイート」に対して実行されるので)
@@ -40,4 +45,4 @@ class TweetHandle:
             except Exception as e:
                 logging.error("[TweetHandle(internal)] " + str(e))
         
-        return datalist
+        return rst

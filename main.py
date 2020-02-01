@@ -116,7 +116,7 @@ def waitDMEvents():
             time.sleep(1)
     logging.info("[main - waitDMEvents] accepted endReq.")
 
-#--メインスレッドではn時間待つ、これはcronによる自動化のため
+#--メインスレッドは単純に待機するだけ、GUI組んでも良しCommand.pyに命令投げるインタフェース整えても良し
 updateThread = threading.Thread(target=updateUser)
 updateThread.setDaemon(True)
 saveThread = threading.Thread(target=saveImages)

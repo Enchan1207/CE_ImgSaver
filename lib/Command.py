@@ -116,7 +116,7 @@ class Command:
 
     #--コマンド:指定IDのユーザを追加
     def add(self, TwitterID):
-        sql = "INSERT INTO userTable VALUES(0,?,0,0,0);"
+        sql = "INSERT INTO userTable VALUES(0,?,0,0,0,0);"
         paramtuple = (TwitterID,)
         self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
         self.dbqEvent.wait()

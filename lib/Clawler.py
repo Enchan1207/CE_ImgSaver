@@ -66,7 +66,8 @@ class Clawler:
         tweets = tlData['tweets']
 
         #--ハンドラに渡して解析
-        datas = self.th.handle(tweets)
+        result = self.th.handle(tweets)
+        datas = result['datalist']
 
         #--userDBを更新
         if(len(datas) > 0):
@@ -83,6 +84,15 @@ class Clawler:
             sql = "UPDATE userTable SET id=1, modified=?,sinceid=?,lastid=? WHERE TwitterID=?"
             paramtuple = (int(datetime.now().timestamp()), sinceid, lastid, user[1])
             self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
+            
+            #--モード2(レコード初期化)の場合はフォロワー数も設定する
+            if (mode == 2):
+                sql = "UPDATE userTable SET followers=? WHERE TwitterID=?"
+                paramtuple = (result['info']['followers'], user[1])
+                self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
+
+            self.dbqEvent.wait()
+            self.dbqEvent.clear()
 
             #--imageDB追加
             sql = "INSERT INTO imageTable values(0,?,?,?,?,?,?)"

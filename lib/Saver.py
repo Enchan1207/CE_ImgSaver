@@ -37,14 +37,15 @@ class Saver:
                 if(not os.path.exists(path)):
                     with open(path, mode = 'wb') as f:
                         f.write(imgData['content'])
-                    sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
-                    self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
-
-                    #--DB更新反映待機
-                    self.dqEvent.wait()
-                    self.dqEvent.clear()
                 else:
                     logging.info("[Saver] this image is already saved: " + str(path))
+
+            sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
+            self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
+
+            #--DB更新反映待機
+            self.dqEvent.wait()
+            self.dqEvent.clear()
             return 0
 
         except Exception as e:
