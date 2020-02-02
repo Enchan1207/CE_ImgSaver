@@ -129,7 +129,7 @@ dmThread.setDaemon(True)
 logging.info("--- Start CE_ImgSaver:" + datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')  + "---")
 initThread.start()
 updateThread.start()
-# saveThread.start()
+saveThread.start()
 # dmThread.start()
 try:
     n = 9
@@ -141,6 +141,6 @@ except KeyboardInterrupt:
     initThread.join()
     updateThread.join()
     saveThread.join()
-    dmThread.join()
+    # dmThread.join()
     print("End request has accepted.")
     exit(0)

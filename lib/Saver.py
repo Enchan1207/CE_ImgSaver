@@ -21,21 +21,24 @@ class Saver:
     #--レコードをもとに画像のバイナリを取得
     def get(self, media):
         #--優先ポイント取得+URLパース
-        likes = media[2]
-        url_raw = media[5]
-        url = url_raw
-        url_elem = re.search(r'(.*\/)(.*?).(jpg|png)$', url_raw).groups(0)
-        url_path = url_elem[0]
-        url_id = url_elem[1]
-        url_sf = url_elem[2]
+        quality = media[2]
+        urlRaw = media[5]
+        url = urlRaw
+        urlElem = re.search(r'(.*\/)(.*?).(jpg|png)$', urlRaw).groups()
+        urlPath = urlElem[0]
+        urlID = urlElem[1]
+        urlSuffix = urlElem[2]
+        isMediathumb = bool(re.match(r'ext_tw_video_thumb', urlRaw))
 
-        if(likes >= 0.3): #高画質
-            url = url_path + url_id + "?format=png"
-        if(likes >= 0.8): #最高画質
-            url = url_path + url_id + "?format=png&name=4096x4096"
+        #--動画のサムネは高画質URLに対応していないので弾く
+        if not isMediathumb:
+            if(quality >= 2): #高画質
+                url = urlPath + urlID + "?format=png"
+            if(quality == 3): #最高画質
+                url += "&name=4096x4096"
 
         response = requests.get(url)
-        imgData = {"url": url, "content": response.content}
+        imgData = {"url": urlRaw, "content": response.content}
         response.close()
         return imgData
 
