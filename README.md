@@ -1,5 +1,7 @@
 # CE_ImgSaver
 
+![Repositories size](https://img.shields.io/github/repo-size/Enchan1207/CE_ImgSaver?color=%2300a000)  
+
 ## OverView
 A simple twitter media downloader written by Python and sqlite.  
 linked account: [@CollectEnchan](twitter.com/CollectEnchan)  
