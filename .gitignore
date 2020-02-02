@@ -12,3 +12,4 @@ img/*
 *.sh
 logfile/
 recov.py
+.out
