@@ -72,5 +72,6 @@ class TweetHandle:
                 pass
             except Exception as e:
                 logging.error("[TweetHandle(internal)] " + str(e))
+                print(e)
         
         return rst

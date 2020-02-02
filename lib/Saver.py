@@ -2,7 +2,7 @@
 #
 # 画像セーバ
 #
-import uuid, requests, time, threading, re, os, logging
+import uuid, requests, time, threading, re, os, logging, copy
 from datetime import datetime
 from lib.DBQueue import DBQueue
 from lib.config import PathConfig
@@ -23,7 +23,7 @@ class Saver:
         #--優先ポイント取得+URLパース
         quality = media[2]
         urlRaw = media[5]
-        url = urlRaw
+        url = copy.copy(urlRaw)
         urlElem = re.search(r'(.*\/)(.*?).(jpg|png)$', urlRaw).groups()
         urlPath = urlElem[0]
         urlID = urlElem[1]
@@ -55,8 +55,8 @@ class Saver:
                 else:
                     logging.info("[Saver] this image is already saved: " + str(path))
 
-            sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
-            self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
+                sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
+                self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
 
             #--DB更新反映待機
             self.dqEvent.wait()
