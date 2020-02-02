@@ -16,23 +16,48 @@ class TweetHandle:
 
     #--ツイートを解析してユーザデータおよび画像ファイルのパスを取得
     def handle(self, tweets):
-        rst = {"datalist": [], "info": {"followers": 114514}} #infoで一段挟んでるのは静的なツイート情報が必要になったときの予約
+        rst = {"datalist": [], "info": {"followers": -1}} #infoで一段挟んでるのは静的なツイート情報が必要になったときの予約
 
-        #--ついでにフォロワー数もとっとく
-        if(len(tweets) > 0):
-            rst['info']['followers'] = tweets[0]['user']['followers_count']
+        logs = []
 
         for tweet in tweets:
             data = {'id': -1, 'timestamp': -1, 'text': "", 'image': []}
             try:
                 entities = tweet['extended_entities']
 
+                #--フォロワー数取得
+                if(rst['info']['followers'] < 0):
+                    rst['info']['followers'] = tweet['user']['followers_count']
+
                 #--画像付きツイートの場合はパスとfav数を収集
                 if('media' in entities):
-                    #--ここで画像に「優先ポイント」を振る
-                    data['likes'] = float(tweet['favorite_count']) / float(tweet['user']['followers_count'])
-                    # print(str(int(tweet['user']['followers_count'])) + ", " + str(data['likes']))
+                    #--保存画質を設定
+                    quality = 1 #画質パラメータ(0:skip 1:low 2:high 3:highest)
+                    prioPts = float(tweet['favorite_count']) / float(tweet['user']['followers_count'])
+                    followers = tweet['user']['followers_count']
 
+                    if(prioPts < 0.03):
+                        if(prioPts >= 0.01):
+                            quality = 1
+                        else:
+                            quality = 0
+                    else:
+                        if(followers >= 600):
+                            if(prioPts >= 0.03 and prioPts <= 0.15):
+                                quality = 2
+                            else:
+                                quality = 3
+                        else:
+                            if(prioPts >= 0.03 and prioPts <= 0.05):
+                                quality = 1
+                            else:
+                                if(prioPts <= 0.2):
+                                    quality = 2
+                                else:
+                                    quality = 1
+
+                    data['likes'] = quality
+             
                     for media in entities['media']:
                         data['image'].append(media['media_url_https'])
 

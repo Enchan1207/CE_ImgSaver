@@ -38,7 +38,7 @@ class UserHandle:
 
     #--指定枚数のSaverに投げる画像を取得
     def getImages(self, count=1):
-        self.queue.enQueue(self.identifier, self.dqEvent, "SELECT * FROM imageTable WHERE localPath=\"Nodata\" LIMIT ?", (count, ))
+        self.queue.enQueue(self.identifier, self.dqEvent, "SELECT * FROM imageTable WHERE localPath=\"Nodata\" AND likes>0 LIMIT ?", (count, ))
         self.dqEvent.wait()
         self.dqEvent.clear()
         images = self.queue.fetchrst(self.identifier)
