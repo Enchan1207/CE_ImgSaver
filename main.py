@@ -116,7 +116,7 @@ def waitDMEvents():
             time.sleep(1)
     logging.info("[main - waitDMEvents] accepted endReq.")
 
-#--メインスレッドではn時間待つ、これはcronによる自動化のため
+#--メインスレッドは単純に待機するだけ、GUI組んでも良しCommand.pyに命令投げるインタフェース整えても良し
 updateThread = threading.Thread(target=updateUser)
 updateThread.setDaemon(True)
 saveThread = threading.Thread(target=saveImages)
@@ -130,7 +130,7 @@ logging.info("--- Start CE_ImgSaver:" + datetime.now().strftime('%Y年%m月%d日
 initThread.start()
 updateThread.start()
 saveThread.start()
-dmThread.start()
+# dmThread.start()
 try:
     n = 9
     time.sleep(n * 60 * 60) #n時間待機
@@ -141,6 +141,6 @@ except KeyboardInterrupt:
     initThread.join()
     updateThread.join()
     saveThread.join()
-    dmThread.join()
+    # dmThread.join()
     print("End request has accepted.")
     exit(0)

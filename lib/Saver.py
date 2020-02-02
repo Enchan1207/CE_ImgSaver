@@ -20,8 +20,25 @@ class Saver:
 
     #--レコードをもとに画像のバイナリを取得
     def get(self, media):
-        response = requests.get(media[5])
-        imgData = {"url": media[5], "content": response.content}
+        #--優先ポイント取得+URLパース
+        quality = media[2]
+        urlRaw = media[5]
+        url = urlRaw
+        urlElem = re.search(r'(.*\/)(.*?).(jpg|png)$', urlRaw).groups()
+        urlPath = urlElem[0]
+        urlID = urlElem[1]
+        urlSuffix = urlElem[2]
+        isMediathumb = bool(re.match(r'ext_tw_video_thumb', urlRaw))
+
+        #--動画のサムネは高画質URLに対応していないので弾く
+        if not isMediathumb:
+            if(quality >= 2): #高画質
+                url = urlPath + urlID + "?format=png"
+            if(quality == 3): #最高画質
+                url += "&name=4096x4096"
+
+        response = requests.get(url)
+        imgData = {"url": urlRaw, "content": response.content}
         response.close()
         return imgData
 
@@ -35,14 +52,15 @@ class Saver:
                 if(not os.path.exists(path)):
                     with open(path, mode = 'wb') as f:
                         f.write(imgData['content'])
-                    sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
-                    self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
-
-                    #--DB更新反映待機
-                    self.dqEvent.wait()
-                    self.dqEvent.clear()
                 else:
                     logging.info("[Saver] this image is already saved: " + str(path))
+
+            sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
+            self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
+
+            #--DB更新反映待機
+            self.dqEvent.wait()
+            self.dqEvent.clear()
             return 0
 
         except Exception as e:
