@@ -3,7 +3,7 @@
 # ツイートハンドラ
 #
 
-import json, logging
+import json, logging, traceback
 from lib.config import PathConfig
 from datetime import datetime
 
@@ -57,7 +57,8 @@ class TweetHandle:
                                     quality = 1
 
                     data['likes'] = quality
-             
+
+                    #--URLを追加
                     for media in entities['media']:
                         data['image'].append(media['media_url_https'])
 
@@ -72,5 +73,7 @@ class TweetHandle:
                 pass
             except Exception as e:
                 logging.error("[TweetHandle(internal)] " + str(e))
+                print(tweet)
+                print(traceback.format_exc())
         
         return rst
