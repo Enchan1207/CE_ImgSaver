@@ -13,3 +13,4 @@ img/*
 logfile/
 recov.py
 .out
+*.sql

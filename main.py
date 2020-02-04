@@ -20,7 +20,7 @@ logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ロ
 def dequeueThread():
     logging.info("[main] start to dequeue")
     queue4Dequeue = DBQueue()
-    queue4Dequeue.connect(PATH_DBNAME)
+    queue4Dequeue.connect(PathConfig.PATH_DBNAME, usemySQL=True)
     queue4Dequeue.deQueue(120)
 
 dqthread = threading.Thread(target=dequeueThread)
@@ -30,7 +30,7 @@ dqthread.start()
 #--未探索のユーザを探索するスレッドを立てる
 def initRecord():
     logging.info("[main - InitRecord] start to init untracked user record")
-    clawler = Clawler(PATH_DBNAME)
+    clawler = Clawler(PathConfig.PATH_DBNAME)
     uh = UserHandle()
     target = uh.getUnTrackedUser()
     while (len(target) > 0) and (not endReq):
@@ -44,7 +44,7 @@ def initRecord():
 #--レコード初期化済みのユーザを更新するスレッドを立てる
 def updateUser():
     logging.info("[main - UpdateUser] start to update tracked user data")
-    clawler = Clawler(PATH_DBNAME)
+    clawler = Clawler(PathConfig.PATH_DBNAME)
     uh = UserHandle()
     target = uh.getNext()
     #--endreqがくるまで止まらない、更新対象がいなくても定期的にDB内に対象ユーザがいないかチェック
@@ -69,7 +69,7 @@ def updateUser():
 def saveImages():
     logging.info("[main - saveImage] save tracked image")
 
-    saver = Saver(PATH_DBNAME, PathConfig.PATH_IMGSAVE)
+    saver = Saver(PathConfig.PATH_DBNAME, PathConfig.PATH_IMGSAVE)
     uh = UserHandle()
     pre_endReq = False #endReqをじかに受け取らない
 
@@ -85,12 +85,6 @@ def saveImages():
                 logging.info("[main - saveImage] get: " + image[5])
                 time.sleep(3)
 
-                #--終了リクエストが来ても'このfor文は'止まらない
-                if(endReq and (not pre_endReq)):
-                    logging.info("[main - saveImage] saveImages has received(not ACCEPTED) endreq.")
-                    pre_endReq = True
-
-
             #--適当に名前つけて保存(ここはendReqを無視する)
             logging.info("[main - saveImage] started to save " + str(len(files)) + " images...")
             saver.save(files)
@@ -98,6 +92,11 @@ def saveImages():
             logging.info("[main - saveImage] complete to save.")
         else:
             time.sleep(4)
+
+        #--終了リクエストが来ても'このfor文は'止まらない
+        if(endReq and (not pre_endReq)):
+            logging.info("[main - saveImage] saveImages has received(not ACCEPTED) endreq.")
+            pre_endReq = True
 
     if endReq:
         logging.info("[main - saveImage] accepted endreq")

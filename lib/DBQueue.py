@@ -3,6 +3,7 @@
 # DBのキュー処理
 #
 from lib.DBAccess import DBAccess
+from lib.DBAccess_ms import DBAccess_ms
 from lib.config import PathConfig
 import threading, logging
 
@@ -18,8 +19,11 @@ class DBQueue():
         logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ログの出力先とレベル
     
     #--
-    def connect(self, dbname):
-        self.pdo = DBAccess(dbname)
+    def connect(self, dbname, usemySQL=False):
+        if(usemySQL):
+            self.pdo = DBAccess_ms(dbname)
+        else:
+            self.pdo = DBAccess(dbname)
 
     #--クライアント初期化
     def initClient(self, client):

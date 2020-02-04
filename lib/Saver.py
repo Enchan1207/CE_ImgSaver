@@ -50,8 +50,11 @@ class Saver:
                 name = re.sub(r'^.*\/', "", imgData['url'])
                 path = self.svparent + "/" + name
                 if(not os.path.exists(path)):
-                    with open(path, mode = 'wb') as f:
-                        f.write(imgData['content'])
+                    if(len(imgData['content']) > 0):
+                        with open(path, mode = 'wb') as f:
+                            f.write(imgData['content'])
+                    else:
+                        logging.info("[Saver] this image has no data: " + str(imgData['url']))
                 else:
                     logging.info("[Saver] this image is already saved: " + str(path))
 
