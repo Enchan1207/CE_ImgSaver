@@ -61,9 +61,9 @@ class Saver:
                 sql = "UPDATE imageTable SET localPath=? WHERE imgPath=?"
                 self.queue.enQueue(self.identifier, self.dqEvent, sql, (path, imgData['url']))
 
-            #--DB更新反映待機
-            self.dqEvent.wait()
-            self.dqEvent.clear()
+                #--DB更新反映待機
+                self.dqEvent.wait()
+                self.dqEvent.clear()
             return 0
 
         except Exception as e:

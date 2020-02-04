@@ -34,9 +34,14 @@ def initRecord():
     uh = UserHandle()
     target = uh.getUnTrackedUser()
     while (len(target) > 0) and (not endReq):
+        st = time.time()
+
         clawler.update(target[0], 2)
         logging.info("[main - initRecord] track:" + target[0][1])
-        time.sleep(5)
+
+        pt = time.time() - st #処理にかかった時間
+        if((5 - pt) > 0):
+            time.sleep(5 - pt)
         target = uh.getUnTrackedUser()
 
     logging.info("[main - initRecord] complete tracking new users.")
@@ -50,11 +55,16 @@ def updateUser():
     #--endreqがくるまで止まらない、更新対象がいなくても定期的にDB内に対象ユーザがいないかチェック
     while (not endReq):
         if(len(target) > 0):
+            st = time.time()
+
             clawler.update(target[0], 0)
             clawler.update(target[0], 1)
             stat = clawler.getAPIStat()
             logging.info("[main - updateUser] update:" + str(target[0][1]) + " API Status: " + str(stat['remaining']) + "/" + str(stat['limit']))
-            time.sleep(3)
+
+            pt = time.time() - st #処理にかかった時間
+            if((3 - pt) > 0):
+                time.sleep(3 - pt)
         else:
             time.sleep(10)
 
@@ -80,10 +90,14 @@ def saveImages():
         logging.info("[main - saveImage] found:" + str(len(images)) + " images.")
         if(len(images) > 0):
             for image in images:
+                st = time.time()
                 #--サーバから取得して待機
                 files.append(saver.get(image))
                 logging.info("[main - saveImage] get: " + image[5])
-                time.sleep(3)
+
+                pt = time.time() - st #処理にかかった時間
+                if((3 - pt) > 0):
+                    time.sleep(3 - pt)
 
             #--適当に名前つけて保存(ここはendReqを無視する)
             logging.info("[main - saveImage] started to save " + str(len(files)) + " images...")
