@@ -143,17 +143,18 @@ logging.info("--- Start CE_ImgSaver:" + datetime.now().strftime('%Y年%m月%d日
 initThread.start()
 updateThread.start()
 saveThread.start()
-# dmThread.start()
+dmThread.start()
 try:
     n = 9
     time.sleep(n * 60 * 60) #n時間待機
     endReq = True
 except KeyboardInterrupt:
     print("Process end request has requested(not ACCEPTED). please wait other daemon threads...")
+    logging.info("[main] **CAUTION:** endReq was requested(not accepted).")
     endReq = True
     initThread.join()
     updateThread.join()
     saveThread.join()
-    # dmThread.join()
+    dmThread.join()
     print("End request has accepted.")
     exit(0)
