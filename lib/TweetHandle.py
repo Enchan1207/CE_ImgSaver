@@ -72,7 +72,7 @@ class TweetHandle:
                 #--ここでは何もしない(キーエラーは「画像のないツイート」に対して実行されるので)
                 pass
             except Exception as e:
-                logging.error("[TweetHandle(internal)] " + str(e))
+                logging.error(str(int(datetime.now().timestamp())) + ": [TweetHandle(internal)] " + str(e))
                 print(tweets)
                 print(traceback.format_exc())
         

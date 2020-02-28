@@ -18,7 +18,7 @@ logging.basicConfig(filename=PathConfig.PATH_LOGOUTPUT, level=logging.INFO) #ロ
 
 #--デキュースレッドを立てる
 def dequeueThread():
-    logging.info("[main] start to dequeue")
+    logging.info(str(int(datetime.now().timestamp())) + ": [main] start to dequeue")
     queue4Dequeue = DBQueue()
     queue4Dequeue.connect(PathConfig.PATH_DBNAME, usemySQL=True)
     queue4Dequeue.deQueue(120)
@@ -29,7 +29,7 @@ dqthread.start()
 
 #--未探索のユーザを探索するスレッドを立てる
 def initRecord():
-    logging.info("[main - InitRecord] start to init untracked user record")
+    logging.info(str(int(datetime.now().timestamp())) + ": [main - InitRecord] start to init untracked user record")
     clawler = Clawler(PathConfig.PATH_DBNAME)
     uh = UserHandle()
     target = uh.getUnTrackedUser()
@@ -37,18 +37,18 @@ def initRecord():
         st = time.time()
 
         clawler.update(target[0], 2)
-        logging.info("[main - initRecord] track:" + target[0][1])
+        logging.info(str(int(datetime.now().timestamp())) + ": [main - initRecord] track:" + target[0][1])
 
         pt = time.time() - st #処理にかかった時間
         if((5 - pt) > 0):
             time.sleep(5 - pt)
         target = uh.getUnTrackedUser()
 
-    logging.info("[main - initRecord] complete tracking new users.")
+    logging.info(str(int(datetime.now().timestamp())) + ": [main - initRecord] complete tracking new users.")
 
 #--レコード初期化済みのユーザを更新するスレッドを立てる
 def updateUser():
-    logging.info("[main - UpdateUser] start to update tracked user data")
+    logging.info(str(int(datetime.now().timestamp())) + ": [main - UpdateUser] start to update tracked user data")
     clawler = Clawler(PathConfig.PATH_DBNAME)
     uh = UserHandle()
     target = uh.getNext()
@@ -60,7 +60,7 @@ def updateUser():
             clawler.update(target[0], 0)
             clawler.update(target[0], 1)
             stat = clawler.getAPIStat()
-            logging.info("[main - updateUser] update:" + str(target[0][1]) + " API Status: " + str(stat['remaining']) + "/" + str(stat['limit']))
+            logging.info(str(int(datetime.now().timestamp())) + ": [main - updateUser] update:" + str(target[0][1]) + " API Status: " + str(stat['remaining']) + "/" + str(stat['limit']))
 
             pt = time.time() - st #処理にかかった時間
             if((3 - pt) > 0):
@@ -71,13 +71,13 @@ def updateUser():
         target = uh.getNext()
 
     if(endReq):
-        logging.info("[main - updateUser] accepted endreq")
+        logging.info(str(int(datetime.now().timestamp())) + ": [main - updateUser] accepted endreq")
     else:
-        logging.info("[main - updateUser] complete update")
+        logging.info(str(int(datetime.now().timestamp())) + ": [main - updateUser] complete update")
 
 #--画像を保存するスレッドを立てる
 def saveImages():
-    logging.info("[main - saveImage] save tracked image")
+    logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] save tracked image")
 
     saver = Saver(PathConfig.PATH_DBNAME, PathConfig.PATH_IMGSAVE)
     uh = UserHandle()
@@ -87,35 +87,35 @@ def saveImages():
     files = []
     while (not pre_endReq):
         images = uh.getImages(10)
-        logging.info("[main - saveImage] found:" + str(len(images)) + " images.")
+        logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] found:" + str(len(images)) + " images.")
         if(len(images) > 0):
             for image in images:
                 st = time.time()
                 #--サーバから取得して待機
                 files.append(saver.get(image))
-                logging.info("[main - saveImage] get: " + image[5])
+                logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] get: " + image[5])
 
                 pt = time.time() - st #処理にかかった時間
                 if((3 - pt) > 0):
                     time.sleep(3 - pt)
 
             #--適当に名前つけて保存(ここはendReqを無視する)
-            logging.info("[main - saveImage] started to save " + str(len(files)) + " images...")
+            logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] started to save " + str(len(files)) + " images...")
             saver.save(files)
             files = []
-            logging.info("[main - saveImage] complete to save.")
+            logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] complete to save.")
         else:
             time.sleep(4)
 
         #--終了リクエストが来ても'このfor文は'止まらない
         if(endReq and (not pre_endReq)):
-            logging.info("[main - saveImage] saveImages has received(not ACCEPTED) endreq.")
+            logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] saveImages has received(not ACCEPTED) endreq.")
             pre_endReq = True
 
     if endReq:
-        logging.info("[main - saveImage] accepted endreq")
+        logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] accepted endreq")
     else:
-        logging.info("[main - saveImage] image tracking completed")
+        logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] image tracking completed")
     return 0
 
 #--DMを待機するスレッドを立てる
@@ -127,7 +127,7 @@ def waitDMEvents():
             if(endReq):
                 break
             time.sleep(1)
-    logging.info("[main - waitDMEvents] accepted endReq.")
+    logging.info(str(int(datetime.now().timestamp())) + ": [main - waitDMEvents] accepted endReq.")
 
 #--メインスレッドは単純に待機するだけ、GUI組んでも良しCommand.pyに命令投げるインタフェース整えても良し
 updateThread = threading.Thread(target=updateUser)
@@ -150,7 +150,7 @@ try:
     endReq = True
 except KeyboardInterrupt:
     print("Process end request has requested(not ACCEPTED). please wait other daemon threads...")
-    logging.info("[main] **CAUTION:** endReq was requested(not accepted).")
+    logging.info(str(int(datetime.now().timestamp())) + ": [main] **CAUTION:** endReq was requested(not accepted).")
     endReq = True
     initThread.join()
     updateThread.join()

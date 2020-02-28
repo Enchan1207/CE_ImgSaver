@@ -124,7 +124,7 @@ class Saver:
             return 0
 
         except Exception as e:
-            logging.error("[Saver(internal)] " + str(e))
+            logging.error(str(int(datetime.now().timestamp())) + ": [Saver(internal)] " + str(e))
             return 1
 
     # --保存結果を取得
