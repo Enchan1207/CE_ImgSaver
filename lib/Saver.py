@@ -48,8 +48,28 @@ class Saver:
                 url += "&name=4096x4096"
 
         response = requests.get(url)
+        originData = response.content
 
-        imgData = {"url": urlRaw,"content": response.content}
+        # --サムネイルを作成または取得
+        thumbType = "pbsthumb"
+        if not isMediathumb:
+            response = requests.get(
+                urlPath + urlID + "?format=jpg&name=thumb")  # これで正規のサムネが手に入る
+            thumbData = response.content
+        else:
+            # 動画のサムネはPILで変換するしかなさそう
+            pilImage = Image.open(io.BytesIO(originData))
+            thumbData = pilImage.resize((150, 150), Image.NEAREST)
+            thumbType = "pilthumb"
+
+        imgData = {
+            "url": urlRaw,
+            "content": originData,
+            "thumb": {
+                "type": thumbType,
+                "content": thumbData
+            }
+        }
         response.close()
         return imgData
 
@@ -62,16 +82,14 @@ class Saver:
                 name = re.sub(r'^.*\/', "", imgData['url'])
                 originPath = self.svparent + "/" + name
                 thumbPath = self.svparent + "/thumb_" + name
+
+                # --画像が保存されていなければ書き込む
                 if(not os.path.exists(originPath)):
                     if(len(imgData['content']) > 0):
                         # --オリジナル保存
                         with open(originPath, mode='wb') as f:
                             f.write(imgData['content'])
 
-                        # --サムネイル作成+保存
-                        pilImage = Image.open(io.BytesIO(imgData['content']))
-                        img_resize = pilImage.resize((200, int(pilImage.height * (200 / pilImage.width))), Image.NEAREST)
-                        img_resize.save(thumbPath)
                     else:
                         logging.info(
                             "[Saver] this image has no data: " + str(imgData['url']))
@@ -86,6 +104,23 @@ class Saver:
                 # --DB更新反映待機
                 self.dqEvent.wait()
                 self.dqEvent.clear()
+
+                # --サムネも同様に保存する
+                if(not os.path.exists(thumbPath)):
+                    if(len(imgData['thumb']['content']) > 0):
+                        # --pbsかPILかで保存方式が違う
+                        if(imgData['thumb']['type'] == "pbsthumb"):
+                            with open(thumbPath, mode='wb') as f:
+                                f.write(imgData['thumb']['content'])
+                        else:
+                            imgData['thumb']['content'].save(thumbPath)
+                    else:
+                        logging.info(
+                            "[Saver] this image has no data: " + str(imgData['url']))
+                else:
+                    logging.info(
+                        "[Saver] this image is already saved: " + str(thumbPath))
+
             return 0
 
         except Exception as e:
