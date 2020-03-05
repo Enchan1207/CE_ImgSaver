@@ -16,16 +16,16 @@ linked account: [@CollectEnchan](twitter.com/CollectEnchan)
 
     - recovery.sql: sql file for recovery
     - data.db(ignored): main database
-    - ~~(some batch or shell file is used to observe using `watch` or `cat` .)~~ **Ignored**
+    - ~~(some batch or shell file is used to observe using `watch` or `cat` .)~~ **Batch files was Ignored  because of security reason.**
 
  * lib/
 
     - Clawler.py: timeline updater
-    - Command.py: DM Command parse and execute
+    - ~~Command.py: DM Command parse and execute~~ **the feature of DM communication became deprecated**
     - config.py(ignored): TwitterAPI configuration
     - DBAccess.py: DB control
     - DBQueue.py: DB queue control
-    - DMComm.py: DM Communication
+    - ~~DMComm.py: DM Communication~~ **the feature of DM communication became deprecated**
     - ~~ErrHandle.py: Error handling~~ **Error handling is replaced by logging module.**
     - GetTl.py: getting twitter timeline
     - Saver.py: saving timelines medias
@@ -67,9 +67,6 @@ make `config.py` and write some code shown below:
         CONSUMER_SECRET = "{API Key Secret}"
         ACCESS_TOKEN = "{Access Token}"
         ACCESS_TOKEN_SECRET = "{Access Token Secret}"
-
-    class DMConfig:
-        ID_MASTER = "{Admins Recipient ID}"
 
     class PathConfig:
         PATH_IMGSAVE = "{image-saving path}"

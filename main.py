@@ -6,7 +6,6 @@ from lib.UserHandle import UserHandle
 from lib.DBQueue import DBQueue
 from lib.Clawler import Clawler
 from lib.Saver import Saver
-from lib.Command import Command
 from lib.config import PathConfig
 from datetime import datetime
 import time, threading, logging
@@ -121,17 +120,6 @@ def saveImages():
     else:
         logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] image tracking completed")
     return 0
-
-#--DMを待機するスレッドを立てる
-def waitDMEvents():
-    while not endReq:
-        cmd = Command()
-        cmd.process()
-        for n in range(80):
-            if(endReq):
-                break
-            time.sleep(1)
-    logging.info(str(int(datetime.now().timestamp())) + ": [main - waitDMEvents] accepted endReq.")
 
 #--メインスレッドは単純に待機するだけ、GUI組んでも良しCommand.pyに命令投げるインタフェース整えても良し
 updateThread = threading.Thread(target=updateUser)
