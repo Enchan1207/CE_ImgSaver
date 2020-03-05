@@ -1,7 +1,7 @@
 -- ユーザーテーブル
 CREATE table userTable(
     id INT,
-    TwitterID VARCHAR(30), -- Twitter ID
+    TwitterID VARCHAR(30) UNIQUE, -- Twitter ID
     modified BIGINT unsigned, -- 最終更新日時
     lastid BIGINT unsigned, -- 過去ツイ探索用起点
     sinceid BIGINT unsigned, -- 新規ツイ探索用起点
