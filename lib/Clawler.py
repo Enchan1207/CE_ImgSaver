@@ -36,7 +36,7 @@ class Clawler:
             "include_entities": True,
             "exclude_replies": False,
             "include_rts": False,
-            "count": 100
+            "count": 200
         }
         #モード分岐 0で最新ツイート 1で過去のツイート 2で指定ユーザのDB初期化
         if(mode == 0):
@@ -69,23 +69,21 @@ class Clawler:
         result = self.th.handle(tweets)
         datas = result['datalist']
 
-        #--userDBを更新
-        if(len(datas) > 0):
-            
-            #--モードによって更新するIDを変える
+        #--ツイートを取得できたらlastidとsinceidを更新
+        if(len(tweets) > 0):
             sinceid = user[4]
             lastid = user[3]
             if(mode == 0 or mode == 2): #新規ツイ探索
-                sinceid = datas[0]['id'] + 1
+                sinceid = tweets[0]['id'] + 1
             if (mode == 1 or mode == 2): #過去ツイ探索
-                lastid = datas[-1]['id'] - 1
-            
+                lastid = tweets[-1]['id'] - 1
+
             #--userDB更新
             sql = "UPDATE userTable SET id=1, modified=?,sinceid=?,lastid=? WHERE TwitterID=?"
             paramtuple = (int(datetime.now().timestamp()), sinceid, lastid, user[1])
             self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
             
-            #--モード2(レコード初期化)の場合はフォロワー数も設定する
+            #--モード2(レコード初期化)の場合はフォロワー数も設定
             if (mode == 2):
                 sql = "UPDATE userTable SET followers=? WHERE TwitterID=?"
                 paramtuple = (result['info']['followers'], user[1])
@@ -94,23 +92,20 @@ class Clawler:
             self.dbqEvent.wait()
             self.dbqEvent.clear()
 
-            #--imageDB追加
-            sql = "INSERT INTO imageTable values(0,?,?,?,?,?,?)"
-            for data in datas:
-                #URL抽出
-                for mdpath in data['image']:
-                    paramtuple = (user[1], data['likes'], data['timestamp'], data['text'], mdpath, "Nodata") #nodataはデータ未取得時の識別子
-                    self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
-                    self.dbqEvent.wait()
-                    self.dbqEvent.clear()
+            #--さらにメディアツイートも含まれていた場合は、imageTableにinsertする
+            if(len(datas) > 0):
+                #--imageDB追加
+                sql = "INSERT INTO imageTable values(0,?,?,?,?,?,?)"
+                for data in datas:
+                    #URL抽出
+                    for mdpath in data['image']:
+                        paramtuple = (user[1], data['likes'], data['timestamp'], data['text'], mdpath, "Nodata") #nodataはデータ未取得時の識別子
+                        self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
+                        self.dbqEvent.wait()
+                        self.dbqEvent.clear()
 
-            return 0
         else:
-            #--ツイートを取得できなくてもmodifiedは変える(これをしないとアカウントが無限ループする)
-            sql = "UPDATE userTable SET modified=? WHERE TwitterID=?"
-            paramtuple = (int(datetime.now().timestamp()), user[1])
-            self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
-
+            # 新規ツイートがない/全てのツイートをクローリングした/ツイートそのものをクローリングできなかった
             if(mode == 0):
                 logging.debug(str(int(datetime.now().timestamp())) + ": [Clawler] now no new tweets: " + user[1])
             elif(mode == 1):
@@ -122,11 +117,21 @@ class Clawler:
                 logging.info(str(int(datetime.now().timestamp())) + ": [Clawler] there is no tweet: " + user[1])
                 self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
 
-            #--DB更新待機
-            self.dbqEvent.wait()
-            self.dbqEvent.clear()
+            if(mode>0):
+                #--DB更新待機
+                self.dbqEvent.wait()
+                self.dbqEvent.clear()
 
-            return 0
+        #--modifiedは必ず更新(これをしないとアカウントが無限ループする)
+        sql = "UPDATE userTable SET modified=? WHERE TwitterID=?"
+        paramtuple = (int(datetime.now().timestamp()), user[1])
+        self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
+
+        #--DB更新待機
+        self.dbqEvent.wait()
+        self.dbqEvent.clear()
+
+        return 0
 
 
     #--APIの状態を返す

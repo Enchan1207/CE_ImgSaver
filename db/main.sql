@@ -1,20 +1,20 @@
 -- ユーザーテーブル
 CREATE table userTable(
     id INT,
-    TwitterID TEXT, -- Twitter ID
-    modified INTEGER, -- 最終更新日時
-    lastid INTEGER, -- 過去ツイ探索用起点
-    sinceid INTEGER, -- 新規ツイ探索用起点
+    TwitterID VARCHAR(30), -- Twitter ID
+    modified BIGINT unsigned, -- 最終更新日時
+    lastid BIGINT unsigned, -- 過去ツイ探索用起点
+    sinceid BIGINT unsigned, -- 新規ツイ探索用起点
     followers INT -- フォロワー数
 );
 
 -- 画像管理テーブル
 CREATE table imageTable(
     id INT,
-    TwitterID TEXT, -- Twitter ID
+    TwitterID VARCHAR(30), -- Twitter ID
     likes INT, -- いいね数
-    post INTEGER, -- ツイート日時
-    content TEXT, -- ツイートされたテキスト
-    imgPath TEXT, -- 画像のパス
-    localPath TEXT -- 画像のローカルパス
+    post BIGINT unsigned, -- ツイート日時
+    content VARCHAR(200), -- ツイートされたテキスト
+    imgPath VARCHAR(200) UNIQUE, -- 画像のパス
+    localPath VARCHAR(200) -- 画像のローカルパス
 );

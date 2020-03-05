@@ -33,15 +33,19 @@ def initRecord():
     clawler = Clawler(PathConfig.PATH_DBNAME)
     uh = UserHandle()
     target = uh.getUnTrackedUser()
-    while (len(target) > 0) and (not endReq):
-        st = time.time()
+    while (not endReq):
+        if(len(target) > 0):
+            st = time.time()
 
-        clawler.update(target[0], 2)
-        logging.info(str(int(datetime.now().timestamp())) + ": [main - initRecord] track:" + target[0][1])
+            clawler.update(target[0], 2)
+            logging.info(str(int(datetime.now().timestamp())) + ": [main - initRecord] track:" + target[0][1])
 
-        pt = time.time() - st #処理にかかった時間
-        if((5 - pt) > 0):
-            time.sleep(5 - pt)
+            pt = time.time() - st #処理にかかった時間
+            if((5 - pt) > 0):
+                time.sleep(5 - pt)
+        else:
+            time.sleep(10)
+
         target = uh.getUnTrackedUser()
 
     logging.info(str(int(datetime.now().timestamp())) + ": [main - initRecord] complete tracking new users.")
@@ -86,7 +90,7 @@ def saveImages():
     #--複数枚持ってきてバイナリ取得
     files = []
     while (not pre_endReq):
-        images = uh.getImages(10)
+        images = uh.getImages(30)
         logging.info(str(int(datetime.now().timestamp())) + ": [main - saveImage] found:" + str(len(images)) + " images.")
         if(len(images) > 0):
             for image in images:
@@ -136,14 +140,11 @@ saveThread = threading.Thread(target=saveImages)
 saveThread.setDaemon(True)
 initThread = threading.Thread(target=initRecord)
 initThread.setDaemon(True)
-dmThread = threading.Thread(target=waitDMEvents)
-dmThread.setDaemon(True)
 
 logging.info("--- Start CE_ImgSaver:" + datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')  + "---")
 initThread.start()
 updateThread.start()
 saveThread.start()
-dmThread.start()
 try:
     n = 9
     time.sleep(n * 60 * 60) #n時間待機
@@ -155,6 +156,5 @@ except KeyboardInterrupt:
     initThread.join()
     updateThread.join()
     saveThread.join()
-    dmThread.join()
     print("End request has accepted.")
     exit(0)

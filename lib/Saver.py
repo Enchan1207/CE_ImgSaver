@@ -83,8 +83,8 @@ class Saver:
                 originPath = self.svparent + "/" + name
                 thumbPath = self.svparent + "/thumb_" + name
 
-                # --画像が保存されていなければ書き込む
-                if(not os.path.exists(originPath)):
+                # --画像が保存されていない、または元サイズより大きければ書き込む
+                if((not os.path.exists(originPath)) or (len(imgData['content']) > os.path.getsize(originPath))):
                     if(len(imgData['content']) > 0):
                         # --オリジナル保存
                         with open(originPath, mode='wb') as f:
