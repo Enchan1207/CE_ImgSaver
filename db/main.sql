@@ -15,6 +15,6 @@ CREATE table imageTable(
     likes INT, -- いいね数
     post BIGINT unsigned, -- ツイート日時
     content VARCHAR(200), -- ツイートされたテキスト
-    imgPath VARCHAR(200) UNIQUE, -- 画像のパス
+    imgPath VARCHAR(190) UNIQUE, -- 画像のパス
     localPath VARCHAR(200) -- 画像のローカルパス
 );
