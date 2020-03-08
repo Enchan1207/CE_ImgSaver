@@ -52,10 +52,10 @@ class Clawler:
 
         #--ツイート取得時にエラー発生
         if('errors' in tlData['tweets']):
-            #--mode=2のときこのエラーが発生した→不正なTwitterIDとみなす
+            #--mode=2のときこのエラーが発生した→不正なuserIDとみなす
             logging.error(str(int(datetime.now().timestamp())) + ": [Clawler] Can't get Tweets: " + str(user[1]))
             if(mode == 2):
-                self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
+                self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE userID=?", (user[1],))
                 return 2
 
         #--API制限に引っかかった
@@ -79,13 +79,13 @@ class Clawler:
                 lastid = tweets[-1]['id'] - 1
 
             #--userDB更新
-            sql = "UPDATE userTable SET id=1, modified=?,sinceid=?,lastid=? WHERE TwitterID=?"
+            sql = "UPDATE userTable SET id=1, modified=?,sinceid=?,lastid=? WHERE userID=?"
             paramtuple = (int(datetime.now().timestamp()), sinceid, lastid, user[1])
             self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
             
             #--モード2(レコード初期化)の場合はフォロワー数も設定
             if (mode == 2):
-                sql = "UPDATE userTable SET followers=? WHERE TwitterID=?"
+                sql = "UPDATE userTable SET followers=? WHERE userID=?"
                 paramtuple = (result['info']['followers'], user[1])
                 self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
 
@@ -110,12 +110,12 @@ class Clawler:
                 logging.debug(str(int(datetime.now().timestamp())) + ": [Clawler] now no new tweets: " + user[1])
             elif(mode == 1):
                 logging.info(str(int(datetime.now().timestamp())) + ": [Clawler] all old tweets has clawled: " + user[1])
-                sql = "UPDATE userTable SET id=2 WHERE TwitterID=?"
+                sql = "UPDATE userTable SET id=2 WHERE userID=?"
                 paramtuple = (user[1],)
                 self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
             elif(mode == 2):
                 logging.info(str(int(datetime.now().timestamp())) + ": [Clawler] there is no tweet: " + user[1])
-                self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE TwitterID=?", (user[1],))
+                self.queue.enQueue(self.identifier, self.dbqEvent, "DELETE FROM userTable WHERE userID=?", (user[1],))
 
             if(mode>0):
                 #--DB更新待機
@@ -123,7 +123,7 @@ class Clawler:
                 self.dbqEvent.clear()
 
         #--modifiedは必ず更新(これをしないとアカウントが無限ループする)
-        sql = "UPDATE userTable SET modified=? WHERE TwitterID=?"
+        sql = "UPDATE userTable SET modified=? WHERE userID=?"
         paramtuple = (int(datetime.now().timestamp()), user[1])
         self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
 

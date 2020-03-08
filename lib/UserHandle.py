@@ -24,7 +24,7 @@ class UserHandle:
     #--指定TwitterIDのユーザを追加
     def addTrackUsers(self, twids):
         for twid in twids:
-            self.queue.enQueue(self.identifier, self.dqEvent, "INSERT INTO userTable VALUES(0,?,0,0,0,0)", (twid,))
+            self.queue.enQueue(self.identifier, self.dqEvent, "INSERT INTO userTable VALUES(0,?,0,0,0,0,0)", (twid,))
             self.dqEvent.wait()
             self.dqEvent.clear()
 
