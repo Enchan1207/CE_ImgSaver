@@ -20,8 +20,8 @@ class TweetHandle:
 
     # --ツイートを解析してユーザデータおよび画像ファイルのパスを取得
     def handle(self, tweets):
-        # infoで一段挟んでるのは静的なツイート情報が必要になったときの予約
-        rst = {"datalist": [], "info": {"followers": -1}}
+        # infoで一段挟んでるのは静的なツイート情報が必要になったときの予約←今になって効きましたね…
+        rst = {"datalist": [], "info": {"followers": -1, "TwitterID":"", "UserName": ""}}
 
         logs = []
 
@@ -30,9 +30,10 @@ class TweetHandle:
             try:
                 entities = tweet['extended_entities']
 
-                # --フォロワー数取得
-                if(rst['info']['followers'] < 0):
-                    rst['info']['followers'] = tweet['user']['followers_count']
+                # --静的なユーザ情報を取得
+                rst['info']['followers'] = tweet['user']['followers_count']
+                rst['info']['TwitterID'] = tweet['user']['screen_name'];
+                rst['info']['UserName'] = tweet['user']['name'];
 
                 # --画像付きツイートの場合はパスとfav数を収集
                 if('media' in entities):
