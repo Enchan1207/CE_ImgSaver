@@ -28,7 +28,8 @@ class DBAccess_ms:
             )
             DBAccess_ms.cursor = DBAccess_ms.connection.cursor(buffered=True)
         except Exception as e:
-            print(e)
+            pass
+            # print(e) #これ許容すると結構うるさい
 
         DBAccess_ms.stat = DBAccess_ms.connection.is_connected()
 
