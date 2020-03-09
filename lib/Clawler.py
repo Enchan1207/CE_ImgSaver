@@ -83,11 +83,10 @@ class Clawler:
             paramtuple = (int(datetime.now().timestamp()), sinceid, lastid, user[1])
             self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
             
-            #--モード2(レコード初期化)の場合はフォロワー数とTwitterIDを設定(TODO:ここUserNameも入れればアカウント名まで特定できる)
-            if (mode == 2):
-                sql = "UPDATE userTable SET followers=?,TwitterID=?,AccountName=? WHERE userID=?"
-                paramtuple = (result['info']['followers'], result['info']['TwitterID'], result['info']['UserName'], user[1])
-                self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
+            #--フォロワー数とTwitterIDを設定
+            sql = "UPDATE userTable SET followers=?,TwitterID=?,AccountName=? WHERE userID=?"
+            paramtuple = (result['info']['followers'], result['info']['TwitterID'], result['info']['UserName'], user[1])
+            self.queue.enQueue(self.identifier, self.dbqEvent, sql, paramtuple)
 
             self.dbqEvent.wait()
             self.dbqEvent.clear()
