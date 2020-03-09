@@ -6,7 +6,8 @@ CREATE table userTable(
     lastid BIGINT unsigned, -- 過去ツイ探索用起点
     sinceid BIGINT unsigned, -- 新規ツイ探索用起点
     followers INT, -- フォロワー数
-    TwitterID VARCHAR(30) -- Twitter ID
+    TwitterID VARCHAR(30), -- Twitter ID
+    AccountName TEXT -- アカウント名
 );
 
 -- 画像管理テーブル
